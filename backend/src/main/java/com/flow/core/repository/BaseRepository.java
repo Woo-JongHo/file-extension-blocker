@@ -1,4 +1,4 @@
-package com.dev.woo.core.repository;
+package com.flow.core.repository;
 
 import jakarta.transaction.Transactional;
 import java.io.Serializable;

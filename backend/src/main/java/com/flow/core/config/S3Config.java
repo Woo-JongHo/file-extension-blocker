@@ -1,4 +1,4 @@
-package com.dev.woo.core.config;
+package com.flow.core.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +29,9 @@ public class S3Config {
   @Value("${aws.s3.bucket:default-bucket}")
   private String bucketName;
 
+  // S3Client는 AWS 키가 설정되어 있을 때만 활성화
+  // TODO: AWS 자격증명 설정 후 주석 해제
+  /*
   @Bean
   @ConditionalOnProperty(name = "aws.s3.access-key")
   public S3Client s3Client() {
@@ -40,6 +43,7 @@ public class S3Config {
         .httpClient(UrlConnectionHttpClient.builder().build())
         .build();
   }
+  */
 
   // S3Presigner는 별도 의존성이 필요하므로 일단 주석 처리
   // @Bean
@@ -50,11 +54,4 @@ public class S3Config {
   //                     AwsBasicCredentials.create(accessKey, secretKey)))
   //             .build();
   // }
-
-  // 임시 설정 정보 로깅
-  @Bean
-  public String s3ConfigInfo() {
-    log.info("S3 Configuration - Region: {}, Bucket: {}", region, bucketName);
-    return "S3 설정 완료";
-  }
 }

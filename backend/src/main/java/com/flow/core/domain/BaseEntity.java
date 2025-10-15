@@ -1,4 +1,4 @@
-package com.dev.woo.core.domain;
+package com.flow.core.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;

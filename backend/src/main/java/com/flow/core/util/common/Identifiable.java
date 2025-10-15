@@ -1,4 +1,4 @@
-package com.dev.woo.core.util.common;
+package com.flow.core.util.common;
 
 public interface Identifiable {
   Long getId();

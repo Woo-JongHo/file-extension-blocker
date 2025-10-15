@@ -1,4 +1,4 @@
-package com.dev.woo.core.response;
+package com.flow.core.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.UnsupportedEncodingException;

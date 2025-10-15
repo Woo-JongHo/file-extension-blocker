@@ -1,4 +1,4 @@
-package com.dev.woo.core.util.search;
+package com.flow.core.util.search;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.dev.woo.core.response;
+package com.flow.core.response;
 
 public enum SuccessCode {
 

@@ -1,6 +1,6 @@
-package com.dev.woo.core.service;
+package com.flow.core.service;
 
-import com.dev.woo.core.util.search.SearchCondition;
+import com.flow.core.util.search.SearchCondition;
 import java.util.List;
 import java.util.Map;
 import org.springframework.data.domain.Page;
