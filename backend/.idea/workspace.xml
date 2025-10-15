@@ -4,35 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="66c2a489-bb4b-435c-a550-5a9052755f9b" name="변경" comment="setting">
-      <change beforePath="$PROJECT_DIR$/../java/.claude/claude.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/build.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/examples/ProductExample.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/examples/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/settings.gradle" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/config/S3Config.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/controller/BaseController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/domain/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/logging/LayerLoggingAspect.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/logging/loggingInterceptor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/repository/BaseRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/response/BaseResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/response/ErrorCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/response/SuccessCode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/service/BaseService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/service/BaseServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/util/FileValidator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/util/audit/AuditorAwareImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/util/common/Identifiable.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/java/com/dev/woo/core/util/search/SearchCondition.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../java/src/main/resources/application.yml" beforeDir="false" />
+    <list default="true" id="66c2a489-bb4b-435c-a550-5a9052755f9b" name="변경" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,30 +61,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Gradle.java 빌드.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/woojongho/Desktop/프로젝트/file-extension-blocker/backend",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "모듈",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "settings.sync",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.java 빌드.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/woojongho/Desktop/프로젝트/file-extension-blocker/backend&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;모듈&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/com/flow/dev" />
+    </key>
+  </component>
   <component name="RunManager" selected="Spring Boot.FileBlockerApplication">
     <configuration name="FileBlockerApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
@@ -148,7 +127,8 @@
       <updated>1758461838438</updated>
       <workItem from="1760455435369" duration="207000" />
       <workItem from="1760479409538" duration="1110000" />
-      <workItem from="1760481096234" duration="7000" />
+      <workItem from="1760481096234" duration="2187000" />
+      <workItem from="1760565391991" duration="629000" />
     </task>
     <task id="LOCAL-00001" summary="setting">
       <option name="closed" value="true" />
