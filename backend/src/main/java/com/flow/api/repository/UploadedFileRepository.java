@@ -9,12 +9,15 @@ import java.util.List;
 public interface UploadedFileRepository extends BaseRepository<UploadedFile, Long> {
   
   // 공간의 모든 파일 조회 (삭제되지 않은 것만)
+  // SELECT * FROM uploaded_file WHERE space_id = ? AND is_deleted = false
   List<UploadedFile> findBySpaceIdAndIsDeletedFalse(Long spaceId);
-  
+
   // 특정 사용자가 업로드한 파일 조회
+  // SELECT * FROM uploaded_file WHERE created_by = ? AND is_deleted = false
   List<UploadedFile> findByCreatedByAndIsDeletedFalse(Long createdBy);
-  
+
   // 공간의 파일 개수
+  // SELECT COUNT(*) FROM uploaded_file WHERE space_id = ? AND is_deleted = false
   Long countBySpaceIdAndIsDeletedFalse(Long spaceId);
 }
 
