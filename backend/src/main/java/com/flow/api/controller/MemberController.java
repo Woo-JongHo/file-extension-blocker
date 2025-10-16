@@ -21,19 +21,23 @@ public class MemberController extends BaseController<Member, MemberDto> {
     super(memberService, modelMapper);
     this.memberService = memberService;
   }
-
+  
   @Override
   protected Class<MemberDto> getDtoClass() { return MemberDto.class; }
 
   @Override
   protected Class<Member> getEntityClass() { return Member.class; }
 
+  // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
+  // 1. GET ?spaceId={spaceId} - 공간의 회원 목록 조회 (spaceId 필수)
+  // ══════════════════════════════════════
   
-  @GetMapping("/check-username/{username}")
-  public ResponseEntity<BaseResponse<Boolean>> checkUsername(@PathVariable String username) {
-    boolean exists = memberService.existsByUsername(username);
-    return successResponse(exists);
+  @GetMapping
+  public ResponseEntity<BaseResponse<List<MemberDto>>> getMembersBySpace(
+      @RequestParam Long spaceId) {
+    List<Member> members = memberService.getMembersBySpace(spaceId);
+    return successResponse(toDtoList(members));
   }
 }
 

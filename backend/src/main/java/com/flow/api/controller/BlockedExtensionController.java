@@ -30,27 +30,31 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
   @Override
   protected Class<BlockedExtension> getEntityClass() { return BlockedExtension.class; }
 
+  // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
+  // 1. GET /list - 모든 차단 확장자 조회
+  // 2. GET /fixed - 고정 확장자 조회
+  // 3. GET /custom - 커스텀 확장자 조회
+  // 4. PATCH /toggle - 고정 확장자 체크/언체크
+  // 5. GET /custom/count - 커스텀 확장자 개수
+  // ══════════════════════════════════════
   
-  @GetMapping
+  @GetMapping("/list")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getBlockedExtensions(@PathVariable Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getBlockedExtensions(spaceId);
-    List<BlockedExtensionDto> dtos = extensions.stream().map(this::toDto).collect(Collectors.toList());
-    return successResponse(dtos);
+    return successResponse(toDtoList(extensions));
   }
 
   @GetMapping("/fixed")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getFixedExtensions(@PathVariable Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getFixedExtensions(spaceId);
-    List<BlockedExtensionDto> dtos = extensions.stream().map(this::toDto).collect(Collectors.toList());
-    return successResponse(dtos);
+    return successResponse(toDtoList(extensions));
   }
 
   @GetMapping("/custom")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getCustomExtensions(@PathVariable Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getCustomExtensions(spaceId);
-    List<BlockedExtensionDto> dtos = extensions.stream().map(this::toDto).collect(Collectors.toList());
-    return successResponse(dtos);
+    return successResponse(toDtoList(extensions));
   }
 
   @PatchMapping("/toggle")

@@ -30,13 +30,16 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
   @Override
   protected Class<UploadedFile> getEntityClass() { return UploadedFile.class; }
 
+  // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
+  // 1. GET /list - 공간의 모든 파일 조회
+  // 2. GET /count - 공간의 파일 개수
+  // ══════════════════════════════════════
   
-  @GetMapping
+  @GetMapping("/list")
   public ResponseEntity<BaseResponse<List<UploadedFileDto>>> getFiles(@PathVariable Long spaceId) {
     List<UploadedFile> files = uploadedFileService.getFilesBySpace(spaceId);
-    List<UploadedFileDto> dtos = files.stream().map(this::toDto).collect(Collectors.toList());
-    return successResponse(dtos);
+    return successResponse(toDtoList(files));
   }
 
   @GetMapping("/count")

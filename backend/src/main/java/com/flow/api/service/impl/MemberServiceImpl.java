@@ -7,10 +7,8 @@ import com.woo.core.service.BaseServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
-/**
- * Member Service Implementation
- */
 @Slf4j
 @Service
 @Transactional
@@ -32,8 +30,8 @@ public class MemberServiceImpl extends BaseServiceImpl<Member> implements Member
 
   @Override
   @Transactional(readOnly = true)
-  public boolean existsByUsername(String username) {
-    return memberRepository.existsByUsername(username);
+  public List<Member> getMembersBySpace(Long spaceId) {
+    return memberRepository.findBySpaceIdAndIsDeletedFalse(spaceId);
   }
 }
 

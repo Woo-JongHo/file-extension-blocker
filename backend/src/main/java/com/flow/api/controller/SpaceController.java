@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -30,13 +29,15 @@ public class SpaceController extends BaseController<Space, SpaceDto> {
   @Override
   protected Class<Space> getEntityClass() { return Space.class; }
 
+  // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
+  // 1. GET /space-list - 모든 공간 조회
+  // ══════════════════════════════════════
   
-  @GetMapping
+  @GetMapping("/space-list")
   public ResponseEntity<BaseResponse<List<SpaceDto>>> getAllSpaces() {
     List<Space> spaces = spaceService.getAllSpaces();
-    List<SpaceDto> dtos = spaces.stream().map(this::toDto).collect(Collectors.toList());
-    return successResponse(dtos);
+    return successResponse(toDtoList(spaces));
   }
 }
 

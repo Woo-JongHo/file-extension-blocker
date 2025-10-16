@@ -3,16 +3,16 @@ package com.flow.api.repository;
 import com.flow.api.domain.Member;
 import com.woo.core.repository.BaseRepository;
 import org.springframework.stereotype.Repository;
-
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface MemberRepository extends BaseRepository<Member, Long> {
   
-  Optional<Member> findByUsername(String username);
-  
+  // 사용자명으로 조회 (삭제되지 않은 것만)
   Optional<Member> findByUsernameAndIsDeletedFalse(String username);
   
-  boolean existsByUsername(String username);
+  // 공간의 모든 회원 조회 (삭제되지 않은 것만)
+  List<Member> findBySpaceIdAndIsDeletedFalse(Long spaceId);
 }
 

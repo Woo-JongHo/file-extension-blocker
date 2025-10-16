@@ -19,11 +19,12 @@ public interface BaseService<T> {
   void delete(Long id);
 
   T findById(Long id);
+  
+  List<T> findAll();
 
   Page<T> search(Map<String, Object> filters, Pageable pageable);
 
   List<SearchCondition> convertFilters(Map<String, Object> filters);
-
 
   void softDelete(T entity);
 }

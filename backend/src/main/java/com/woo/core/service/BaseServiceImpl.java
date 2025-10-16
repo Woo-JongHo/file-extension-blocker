@@ -43,6 +43,11 @@ public abstract class BaseServiceImpl<T> implements BaseService<T> {
   }
 
   @Override
+  public List<T> findAll() {
+    return repository.findAll();
+  }
+
+  @Override
   public List<SearchCondition> convertFilters(Map<String, Object> filters) {
     return filters.entrySet().stream()
         .map(entry -> new SearchCondition(entry.getKey(), entry.getValue()))
