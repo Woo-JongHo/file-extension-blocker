@@ -104,35 +104,19 @@
 
 ### 2.2 Member (사용자)
 
-**설명**: 시스템 사용자
+**설명**: 시스템 사용자 (한 사용자는 하나의 공간에만 속함)
 
 | 컬럼 | 타입 | 제약 | 설명 |
 |------|------|------|------|
 | member_id | BIGSERIAL | PK | 사용자 ID |
 | username | VARCHAR(100) | UNIQUE, NOT NULL | 사용자명 |
-| email | VARCHAR(255) | UNIQUE, NOT NULL | 이메일 |
 | password | VARCHAR(255) | NOT NULL | 비밀번호 (암호화) |
+| space_id | BIGINT | FK | 소속 공간 ID |
+| role | VARCHAR(50) | NOT NULL | 권한 ('ADMIN', 'MEMBER') |
 | created_at | TIMESTAMPTZ | NOT NULL | 생성 일시 |
 | updated_at | TIMESTAMPTZ | NOT NULL | 수정 일시 |
 | created_by | BIGINT | | 생성자 (회원가입 시 NULL) |
 | updated_by | BIGINT | | 수정자 |
-| is_deleted | BOOLEAN | DEFAULT false | 삭제 여부 |
-
----
-
-### 2.3 Space_Member (공간-사용자 연결)
-
-**설명**: 공간에 속한 사용자 및 권한 관리
-
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| space_id | BIGINT | PK, FK | 공간 ID |
-| member_id | BIGINT | PK, FK | 사용자 ID |
-| role | VARCHAR(50) | NOT NULL | 권한 ('ADMIN', 'MEMBER') |
-| created_at | TIMESTAMPTZ | NOT NULL | 생성 일시 |
-| updated_at | TIMESTAMPTZ | NOT NULL | 수정 일시 |
-| created_by | BIGINT | NOT NULL | 생성자 |
-| updated_by | BIGINT | NOT NULL | 수정자 |
 | is_deleted | BOOLEAN | DEFAULT false | 삭제 여부 |
 
 **권한**:
@@ -141,7 +125,7 @@
 
 ---
 
-### 2.4 Blocked_Extension (차단 확장자)
+### 2.3 Blocked_Extension (차단 확장자)
 
 **설명**: 공간별 차단 확장자 목록 (고정 + 커스텀)
 
@@ -173,7 +157,7 @@
 
 ---
 
-### 2.5 Uploaded_File (업로드된 파일)
+### 2.4 Uploaded_File (업로드된 파일)
 
 **설명**: 업로드된 파일 메타데이터
 
@@ -195,29 +179,6 @@
 
 ---
 
-### 2.6 Extension_Usage (확장자 사용 통계)
-
-**설명**: Top-6 자주 차단하는 확장자 관리
-
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| usage_id | BIGSERIAL | PK | 통계 ID |
-| space_id | BIGINT | FK | 공간 ID (NULL이면 전역) |
-| extension | VARCHAR(20) | NOT NULL | 확장자 |
-| usage_count | BIGINT | DEFAULT 0 | 사용 횟수 |
-| created_at | TIMESTAMPTZ | NOT NULL | 생성 일시 |
-| updated_at | TIMESTAMPTZ | NOT NULL | 수정 일시 |
-
-**제약**:
-- UNIQUE (space_id, extension)
-
-**용도**:
-- 전역 Top-6: WHERE space_id IS NULL ORDER BY usage_count DESC LIMIT 6
-- 공간별 인기 확장자 분석
-- 고정 확장자 목록 자동 생성 기준
-
----
-
 ## 3. ERD
 
 ### 테이블 관계도
@@ -226,45 +187,49 @@
 ┌─────────────────┐
 │     Member      │
 │  (사용자)        │
+│  space_id (FK)  │  ← 한 사용자는 하나의 공간에만 속함
+│  role: ADMIN/   │
+│       MEMBER    │
 └────────┬────────┘
+         │ 
+         │ space_id (FK)
+         ▼
+    ┌─────────┐
+    │  Space  │
+    │ (공간)   │
+    └────┬────┘
          │
-         │ created_by, updated_by
+         │ space_id (FK)
          │
-    ┌────┴──────┐
-    │           │
-    ▼           ▼
-┌─────────┐  ┌──────────────────┐
-│  Space  │  │ Space_Member     │
-│ (공간)   │  │ (권한: ADMIN/    │
-└────┬────┘  │  MEMBER)         │
-     │       └──────────────────┘
-     │
-     │ space_id (FK)
-     │
-     ├────────────────────┬────────────────────┐
-     │                    │                    │
-     ▼                    ▼                    ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Blocked_    │  │  Uploaded_   │  │  Extension_  │
-│  Extension   │  │  File        │  │  Usage       │
-│ (차단 확장자) │  │ (업로드 파일) │  │ (사용 통계)  │
-└──────────────┘  └──────────────┘  └──────────────┘
+         ├────────────────────┐
+         │                    │
+         ▼                    ▼
+  ┌──────────────┐  ┌──────────────┐
+  │  Blocked_    │  │  Uploaded_   │
+  │  Extension   │  │  File        │
+  │ (차단 확장자) │  │ (업로드 파일) │
+  └──────────────┘  └──────────────┘
 ```
 
 ### 상세 관계
 
 ```
-Member (1) ──────── (N) Space_Member (N) ──────── (1) Space
-                                                    │
-                                                    │
-                        ┌───────────────────────────┼──────────────────────┐
-                        │                           │                      │
-                        ▼                           ▼                      ▼
-              Blocked_Extension              Uploaded_File         Extension_Usage
-              - space_id (FK)                - space_id (FK)       - space_id (FK)
-              - is_fixed (고정/커스텀)       - mime_type           - usage_count
-              - extension                    - file_path           - extension
+Member (N) ──────── (1) Space
+                            │
+                            │ space_id (FK)
+                            │
+                ┌───────────┴───────────┐
+                │                       │
+                ▼                       ▼
+        Blocked_Extension       Uploaded_File
+        - space_id (FK)         - space_id (FK)
+        - is_fixed (고정/커스텀) - mime_type
+        - extension             - file_path
 ```
+
+**Top-6 확장자**:
+- 별도 테이블 없이 `Blocked_Extension`에서 직접 집계
+- 공간 생성 시 쿼리로 실시간 조회
 
 ---
 
@@ -279,8 +244,9 @@ Member (1) ──────── (N) Space_Member (N) ───────�
 CREATE TABLE member (
   member_id    BIGSERIAL PRIMARY KEY,
   username     VARCHAR(100) NOT NULL UNIQUE,
-  email        VARCHAR(255) NOT NULL UNIQUE,
   password     VARCHAR(255) NOT NULL,
+  space_id     BIGINT REFERENCES space(space_id) ON DELETE SET NULL,
+  role         VARCHAR(50) NOT NULL DEFAULT 'MEMBER' CHECK (role IN ('ADMIN', 'MEMBER')),
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   created_by   BIGINT,
@@ -288,8 +254,13 @@ CREATE TABLE member (
   is_deleted   BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE member IS '시스템 사용자';
+COMMENT ON TABLE member IS '시스템 사용자 (한 사용자는 하나의 공간에만 속함)';
 COMMENT ON COLUMN member.password IS '암호화된 비밀번호 (BCrypt)';
+COMMENT ON COLUMN member.space_id IS '소속 공간 ID';
+COMMENT ON COLUMN member.role IS 'ADMIN: 확장자 관리 가능, MEMBER: 업로드만 가능';
+
+-- 인덱스
+CREATE INDEX idx_member_space ON member(space_id) WHERE is_deleted = false;
 
 -- =========================================================
 -- 2. Space (공간)
@@ -308,25 +279,7 @@ CREATE TABLE space (
 COMMENT ON TABLE space IS '파일 업로드 그룹 공간';
 
 -- =========================================================
--- 3. Space_Member (공간-사용자 연결 및 권한)
--- =========================================================
-CREATE TABLE space_member (
-  space_id     BIGINT NOT NULL REFERENCES space(space_id) ON DELETE CASCADE,
-  member_id    BIGINT NOT NULL REFERENCES member(member_id) ON DELETE CASCADE,
-  role         VARCHAR(50) NOT NULL CHECK (role IN ('ADMIN', 'MEMBER')),
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
-  created_by   BIGINT NOT NULL REFERENCES member(member_id),
-  updated_by   BIGINT NOT NULL REFERENCES member(member_id),
-  is_deleted   BOOLEAN NOT NULL DEFAULT false,
-  PRIMARY KEY (space_id, member_id)
-);
-
-COMMENT ON TABLE space_member IS '공간-사용자 매핑 및 권한 관리';
-COMMENT ON COLUMN space_member.role IS 'ADMIN: 확장자 관리 가능, MEMBER: 업로드만 가능';
-
--- =========================================================
--- 4. Blocked_Extension (차단 확장자)
+-- 3. Blocked_Extension (차단 확장자)
 -- =========================================================
 CREATE TABLE blocked_extension (
   blocked_id     BIGSERIAL PRIMARY KEY,
@@ -350,7 +303,7 @@ CREATE INDEX idx_blocked_extension_space ON blocked_extension(space_id) WHERE is
 CREATE INDEX idx_blocked_extension_fixed ON blocked_extension(space_id, is_fixed) WHERE is_deleted = false;
 
 -- =========================================================
--- 5. Uploaded_File (업로드된 파일)
+-- 4. Uploaded_File (업로드된 파일)
 -- =========================================================
 CREATE TABLE uploaded_file (
   file_id        BIGSERIAL PRIMARY KEY,
@@ -378,64 +331,6 @@ COMMENT ON COLUMN uploaded_file.file_path IS 'S3 경로 또는 로컬 파일 경
 CREATE INDEX idx_uploaded_file_space ON uploaded_file(space_id) WHERE is_deleted = false;
 CREATE INDEX idx_uploaded_file_uploader ON uploaded_file(created_by) WHERE is_deleted = false;
 CREATE INDEX idx_uploaded_file_extension ON uploaded_file(extension) WHERE is_deleted = false;
-
--- =========================================================
--- 6. Extension_Usage (확장자 사용 통계)
--- =========================================================
-CREATE TABLE extension_usage (
-  usage_id       BIGSERIAL PRIMARY KEY,
-  space_id       BIGINT REFERENCES space(space_id) ON DELETE CASCADE,
-  extension      VARCHAR(20) NOT NULL,
-  usage_count    BIGINT NOT NULL DEFAULT 0 CHECK (usage_count >= 0),
-  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT uq_space_extension_usage UNIQUE (space_id, extension)
-);
-
-COMMENT ON TABLE extension_usage IS '확장자 사용 통계 (Top-6 관리)';
-COMMENT ON COLUMN extension_usage.space_id IS 'NULL이면 전역 통계';
-COMMENT ON COLUMN extension_usage.usage_count IS '확장자가 차단 목록에 추가된 횟수 (전역 집계)';
-
--- 인덱스
-CREATE INDEX idx_extension_usage_global ON extension_usage(usage_count DESC) WHERE space_id IS NULL;
-CREATE INDEX idx_extension_usage_space ON extension_usage(space_id, usage_count DESC) WHERE space_id IS NOT NULL;
-
--- =========================================================
--- 7. 전역 확장자 사용 횟수 증가 함수
--- =========================================================
-CREATE OR REPLACE FUNCTION increment_extension_usage(ext TEXT)
-RETURNS VOID LANGUAGE plpgsql AS $$
-BEGIN
-  INSERT INTO extension_usage (space_id, extension, usage_count)
-  VALUES (NULL, normalize_extension(ext), 1)
-  ON CONFLICT (space_id, extension) 
-  DO UPDATE SET 
-    usage_count = extension_usage.usage_count + 1,
-    updated_at = now();
-END $$;
-
-COMMENT ON FUNCTION increment_extension_usage IS '전역 확장자 사용 횟수 증가 (커스텀 확장자 추가 시 호출)';
-
--- =========================================================
--- 8. 커스텀 확장자 추가 시 전역 통계 자동 갱신 트리거
--- =========================================================
-CREATE OR REPLACE FUNCTION trg_update_extension_usage()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
-BEGIN
-  -- 커스텀 확장자가 새로 추가될 때만 전역 통계 갱신
-  IF (TG_OP = 'INSERT' AND NEW.is_fixed = false AND NEW.is_deleted = false) THEN
-    PERFORM increment_extension_usage(NEW.extension);
-  END IF;
-
-  RETURN NEW;
-END $$;
-
-CREATE TRIGGER trg_blocked_extension_usage
-AFTER INSERT ON blocked_extension
-FOR EACH ROW EXECUTE FUNCTION trg_update_extension_usage();
-
-COMMENT ON TRIGGER trg_blocked_extension_usage ON blocked_extension IS 
-'커스텀 확장자 추가 시 전역 통계 자동 갱신';
 
 -- =========================================================
 -- 9. 확장자 정규화 함수
@@ -484,16 +379,10 @@ FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 CREATE TRIGGER trg_space_update BEFORE UPDATE ON space
 FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 
-CREATE TRIGGER trg_space_member_update BEFORE UPDATE ON space_member
-FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
-
 CREATE TRIGGER trg_blocked_extension_update BEFORE UPDATE ON blocked_extension
 FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 
 CREATE TRIGGER trg_uploaded_file_update BEFORE UPDATE ON uploaded_file
-FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
-
-CREATE TRIGGER trg_extension_usage_update BEFORE UPDATE ON extension_usage
 FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 ```
 
@@ -501,22 +390,7 @@ FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 
 ## 5. 초기 데이터
 
-### 5.1 고정 확장자 목록 (Top-6)
-
-**전역 통계에서 가장 많이 차단되는 확장자**:
-
-```sql
--- 전역 Extension_Usage에 초기 데이터 삽입
-INSERT INTO extension_usage (space_id, extension, usage_count) VALUES
-(NULL, 'bat', 1000),
-(NULL, 'exe', 950),
-(NULL, 'sh', 900),
-(NULL, 'cmd', 850),
-(NULL, 'com', 800),
-(NULL, 'app', 750);
-```
-
-### 5.2 공간 생성 시 자동 삽입
+### 5.1 공간 생성 시 Top-6 자동 삽입
 
 **공간 생성 프로시저**:
 
@@ -533,11 +407,16 @@ BEGIN
   VALUES (p_space_name, p_creator_id, p_creator_id)
   RETURNING space_id INTO v_space_id;
   
-  -- 2. 생성자를 ADMIN으로 추가
-  INSERT INTO space_member (space_id, member_id, role, created_by, updated_by)
-  VALUES (v_space_id, p_creator_id, 'ADMIN', p_creator_id, p_creator_id);
+  -- 2. 생성자를 ADMIN으로 등록 (Member 테이블의 space_id 업데이트)
+  UPDATE member 
+  SET space_id = v_space_id, 
+      role = 'ADMIN',
+      updated_by = p_creator_id,
+      updated_at = now()
+  WHERE member_id = p_creator_id;
   
-  -- 3. 고정 확장자 자동 삽입 (Top-6, 기본 unCheck)
+  -- 3. 고정 확장자 자동 삽입 (전역 Top-6, 기본 unCheck)
+  -- Blocked_Extension에서 실시간 집계하여 Top-6 조회
   INSERT INTO blocked_extension (space_id, extension, is_fixed, created_by, updated_by, is_deleted)
   SELECT 
     v_space_id,
@@ -546,25 +425,35 @@ BEGIN
     p_creator_id,
     p_creator_id,
     true   -- 기본 unCheck (is_deleted = true)
-  FROM extension_usage
-  WHERE space_id IS NULL
-  ORDER BY usage_count DESC
-  LIMIT 6;
+  FROM (
+    SELECT extension, COUNT(*) as usage_count
+    FROM blocked_extension
+    WHERE is_fixed = false 
+      AND is_deleted = false
+    GROUP BY extension
+    ORDER BY usage_count DESC
+    LIMIT 6
+  ) AS top_extensions;
   
   RETURN v_space_id;
 END $$;
 
-COMMENT ON FUNCTION create_space_with_defaults IS '공간 생성 시 Top-6 고정 확장자 자동 삽입';
+COMMENT ON FUNCTION create_space_with_defaults IS '공간 생성 시 Top-6 고정 확장자 자동 삽입 (실시간 집계)';
 ```
 
-### 5.3 샘플 데이터
+**설명**:
+- `Blocked_Extension`에서 커스텀 확장자를 실시간 집계
+- 최대 200개 × N개 공간 = 충분히 빠름
+- 별도 테이블 없이 항상 최신 Top-6 보장
+
+### 5.2 샘플 데이터
 
 ```sql
 -- 사용자 생성
-INSERT INTO member (username, email, password) VALUES
-('admin', 'admin@example.com', '$2a$10$...'),  -- BCrypt 암호화
-('user1', 'user1@example.com', '$2a$10$...'),
-('user2', 'user2@example.com', '$2a$10$...');
+INSERT INTO member (username, password) VALUES
+('admin', '$2a$10$...'),  -- BCrypt 암호화
+('user1', '$2a$10$...'),
+('user2', '$2a$10$...');
 
 -- 공간 생성 (프로시저 사용)
 SELECT create_space_with_defaults('프로젝트 A', 1);  -- admin이 생성
@@ -579,9 +468,9 @@ VALUES
 
 ---
 
-## 7. 주요 쿼리
+## 6. 주요 쿼리
 
-### 7.1 공간의 차단 확장자 목록 조회
+### 6.1 공간의 차단 확장자 목록 조회
 
 ```sql
 -- 활성화된 차단 확장자만 조회
@@ -592,18 +481,20 @@ WHERE space_id = ?
 ORDER BY is_fixed DESC, extension ASC;
 ```
 
-### 7.2 Top-6 고정 확장자 조회
+### 6.2 Top-6 고정 확장자 조회
 
 ```sql
--- 전역 Top-6
-SELECT extension, usage_count
-FROM extension_usage
-WHERE space_id IS NULL
+-- 전역 Top-6 (실시간 집계)
+SELECT extension, COUNT(*) as usage_count
+FROM blocked_extension
+WHERE is_fixed = false 
+  AND is_deleted = false
+GROUP BY extension
 ORDER BY usage_count DESC
 LIMIT 6;
 ```
 
-### 7.3 커스텀 확장자 개수 확인 (200개 제한)
+### 6.3 커스텀 확장자 개수 확인 (200개 제한)
 
 ```sql
 -- 공간별 커스텀 확장자 개수 (최대 200개 제한)
@@ -614,7 +505,7 @@ WHERE space_id = ?
   AND is_deleted = false;
 ```
 
-### 7.4 파일 업로드 가능 여부 확인
+### 6.4 파일 업로드 가능 여부 확인
 
 ```sql
 -- 특정 확장자가 차단되어 있는지 확인
@@ -627,7 +518,7 @@ WHERE space_id = ?
 ) AS is_blocked;
 ```
 
-### 7.5 고정 확장자 체크/언체크
+### 6.5 고정 확장자 체크/언체크
 
 ```sql
 -- 체크: is_deleted = false
@@ -642,7 +533,7 @@ WHERE space_id = ?
   AND is_fixed = true;
 ```
 
-### 7.6 커스텀 확장자 추가 (전역 통계 자동 갱신)
+### 6.6 커스텀 확장자 추가
 
 ```sql
 -- 사전 검증: 개수 제한 확인 (200개)
@@ -656,33 +547,30 @@ WHERE space_id = ? AND is_fixed = false AND is_deleted = false;
 -- 커스텀 확장자 추가
 INSERT INTO blocked_extension (space_id, extension, is_fixed, created_by, updated_by, is_deleted)
 VALUES (?, normalize_extension(?), false, ?, ?, false);
-
--- 전역 통계 자동 갱신 (트리거가 처리)
--- extension_usage (space_id=NULL, extension=?, usage_count) 자동 증가
 ```
 
 ---
 
-## 8. 비즈니스 로직
+## 7. 비즈니스 로직
 
-### 8.1 고정 확장자 (is_fixed = true)
+### 7.1 고정 확장자 (is_fixed = true)
 
 - **개수**: 최대 6개 (Top-6)
-- 공간 생성 시 자동 삽입
+- 공간 생성 시 자동 삽입 (실시간 집계)
 - 기본값: unCheck (is_deleted = true)
 - 체크/언체크 시 is_deleted 토글
 - **삭제 불가** (항상 테이블에 존재)
 - 커스텀 확장자 영역에 표시 안 됨
 - **개수 제한에 포함되지 않음**
 
-### 8.2 커스텀 확장자 (is_fixed = false)
+### 7.2 커스텀 확장자 (is_fixed = false)
 
 - **최대 개수**: 200개 (요건 명시)
 - **최대 길이**: 20자 (요건 명시)
 - 사용자가 직접 추가
 - X 버튼 클릭 시 is_deleted = true
 - 커스텀 확장자 영역에 표시
-- **추가 시 전역 Extension_Usage 카운팅 자동 증가** (트리거)
+- **전역 Top-6 집계에 자동 반영** (조회 시 실시간 집계)
 
 **추가 전 검증** (애플리케이션 레벨):
 ```java
@@ -698,7 +586,7 @@ if (customCount >= 200) {
 }
 ```
 
-### 8.3 총 차단 확장자 개수 (요건 기반)
+### 7.3 총 차단 확장자 개수 (요건 기반)
 
 ```
 ┌──────────────────────────────────────┐
@@ -716,41 +604,28 @@ if (customCount >= 200) {
 - 커스텀 200개는 애플리케이션 레벨에서 검증
 - 확장자 길이 20자 초과 시 입력 불가
 
-### 8.4 전역 통계 갱신
+### 7.4 Top-6 갱신 방식
 
-- 커스텀 확장자가 추가될 때마다 전역 Extension_Usage의 usage_count 증가
-- 트리거로 자동 처리: `trg_blocked_extension_usage`
-- 예시:
+- **실시간 집계**: 별도 테이블 없이 `Blocked_Extension`에서 직접 조회
+- **조회 쿼리**:
+  ```sql
+  SELECT extension, COUNT(*) as usage_count
+  FROM blocked_extension
+  WHERE is_fixed = false AND is_deleted = false
+  GROUP BY extension
+  ORDER BY usage_count DESC
+  LIMIT 6;
   ```
-  스터디 A에서 .asd 추가 → extension_usage (space_id=NULL, extension='asd', count=1)
-  스터디 B에서 .asd 추가 → extension_usage (space_id=NULL, extension='asd', count=2)
-  스터디 C에서 .asd 추가 → extension_usage (space_id=NULL, extension='asd', count=3)
-  ...
-  많이 추가되면 → Top-6에 포함되어 고정 확장자로 승격 가능
-  ```
+- **장점**:
+  - 항상 최신 데이터 반영
+  - 트리거 불필요
+  - 단순한 구조
+- **성능**: 최대 200개 × N개 공간 → GROUP BY 충분히 빠름
 
-### 8.5 확장자 중복 방지
+### 7.5 확장자 중복 방지
 
 - UNIQUE 제약: (space_id, extension)
 - 같은 공간에서 동일 확장자 중복 불가
 - 고정 확장자를 커스텀으로 다시 추가 불가
 
 ---
-
-## 8. 기술 스택
-
-**Database**: PostgreSQL 15+  
-**ORM**: Spring Data JPA  
-**Migration**: Flyway 또는 Liquibase
-
----
-
-## 9. 확장 고려사항
-
-### 향후 추가 기능
-
-- [ ] 파일 버전 관리 (uploaded_file에 version 컬럼)
-- [ ] 공간별 스토리지 용량 제한
-- [ ] 파일 공유 권한 관리
-- [ ] 감사 로그 테이블 (audit_log)
-- [ ] 바이러스 스캔 결과 저장 (scan_result)
