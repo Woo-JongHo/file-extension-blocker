@@ -1,5 +1,6 @@
 package com.flow.api.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.woo.core.util.common.Identifiable;
 import lombok.*;
 
@@ -17,9 +18,11 @@ public class BlockedExtensionDto implements Identifiable {
   private Boolean isBlocked;
 
   @Override
+  @JsonIgnore
   public Long getId() { return blockedId; }
 
   @Override
+  @JsonIgnore
   public void setId(Long id) { this.blockedId = id; }
 }
 

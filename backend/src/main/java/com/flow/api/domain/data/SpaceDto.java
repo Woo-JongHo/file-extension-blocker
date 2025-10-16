@@ -1,5 +1,6 @@
 package com.flow.api.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.woo.core.util.common.Identifiable;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -20,11 +21,13 @@ public class SpaceDto implements Identifiable {
   private LocalDateTime createdAt;
 
   @Override
+  @JsonIgnore
   public Long getId() {
     return spaceId;
   }
 
   @Override
+  @JsonIgnore
   public void setId(Long id) {
     this.spaceId = id;
   }

@@ -1,5 +1,6 @@
 package com.flow.api.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.flow.api.domain.Member.MemberRole;
 import com.woo.core.util.common.Identifiable;
@@ -26,11 +27,13 @@ public class MemberDto implements Identifiable {
   private MemberRole role;
 
   @Override
+  @JsonIgnore
   public Long getId() {
     return memberId;
   }
 
   @Override
+  @JsonIgnore
   public void setId(Long id) {
     this.memberId = id;
   }

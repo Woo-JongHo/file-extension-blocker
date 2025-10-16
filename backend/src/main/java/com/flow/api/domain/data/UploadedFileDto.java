@@ -1,5 +1,6 @@
 package com.flow.api.domain.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.woo.core.util.common.Identifiable;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -23,9 +24,11 @@ public class UploadedFileDto implements Identifiable {
   private String uploaderName;
 
   @Override
+  @JsonIgnore
   public Long getId() { return fileId; }
 
   @Override
+  @JsonIgnore
   public void setId(Long id) { this.fileId = id; }
 }
 

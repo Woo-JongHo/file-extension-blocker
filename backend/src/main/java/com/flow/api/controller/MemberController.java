@@ -10,6 +10,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/members")
@@ -27,13 +29,13 @@ public class MemberController extends BaseController<Member, MemberDto> {
 
   @Override
   protected Class<Member> getEntityClass() { return Member.class; }
-
+  
   // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
-  // 1. GET ?spaceId={spaceId} - 공간의 회원 목록 조회 (spaceId 필수)
+  // 1. GET /member-list?spaceId={spaceId} - 공간의 회원 목록 조회 (spaceId 필수)
   // ══════════════════════════════════════
   
-  @GetMapping
+  @GetMapping("/member-list")
   public ResponseEntity<BaseResponse<List<MemberDto>>> getMembersBySpace(
       @RequestParam Long spaceId) {
     List<Member> members = memberService.getMembersBySpace(spaceId);

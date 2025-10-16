@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -29,7 +28,7 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
 
   @Override
   protected Class<UploadedFile> getEntityClass() { return UploadedFile.class; }
-
+  
   // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
   // 1. GET /list - 공간의 모든 파일 조회

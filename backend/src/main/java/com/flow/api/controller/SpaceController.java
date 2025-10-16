@@ -28,7 +28,7 @@ public class SpaceController extends BaseController<Space, SpaceDto> {
 
   @Override
   protected Class<Space> getEntityClass() { return Space.class; }
-
+  
   // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
   // 1. GET /space-list - 모든 공간 조회
