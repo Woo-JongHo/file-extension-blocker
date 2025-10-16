@@ -1,52 +1,32 @@
 package com.flow.api.domain.data;
 
+import com.woo.core.util.common.Identifiable;
 import lombok.*;
 import java.time.LocalDateTime;
 
 /**
- * Space 관련 DTO
+ * Space DTO
  */
-public class SpaceDto {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SpaceDto implements Identifiable {
+  
+  private Long spaceId;
+  private String spaceName;
+  private String description;
+  private LocalDateTime createdAt;
 
-  /**
-   * 공간 생성 요청
-   */
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Builder
-  public static class CreateRequest {
-    private String spaceName;
-    private String description;
+  @Override
+  public Long getId() {
+    return spaceId;
   }
 
-  /**
-   * 공간 수정 요청
-   */
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Builder
-  public static class UpdateRequest {
-    private String spaceName;
-    private String description;
-  }
-
-  /**
-   * 공간 응답
-   */
-  @Getter
-  @Setter
-  @NoArgsConstructor
-  @AllArgsConstructor
-  @Builder
-  public static class Response {
-    private Long spaceId;
-    private String spaceName;
-    private String description;
-    private LocalDateTime createdAt;
+  @Override
+  public void setId(Long id) {
+    this.spaceId = id;
   }
 }
 
