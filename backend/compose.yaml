@@ -6,7 +6,7 @@ services:
       - 'POSTGRES_USER=flow-user'
       - 'POSTGRES_PASSWORD=flow12!@'
     ports:
-      - '5432:5432'
+      - '5445:5432'
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
