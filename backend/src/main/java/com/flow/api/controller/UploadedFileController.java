@@ -29,8 +29,7 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
   @Override
   protected Class<UploadedFile> getEntityClass() { return UploadedFile.class; }
   
-  // ══════════════════════════════════════
-  // ========== 비즈니스 로직 ==========
+  // ══════════비즈니스 로직═══════════════════
   // 1. GET /list - 공간의 모든 파일 조회
   // 2. GET /count - 공간의 파일 개수
   // ══════════════════════════════════════

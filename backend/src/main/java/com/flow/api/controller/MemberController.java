@@ -30,8 +30,7 @@ public class MemberController extends BaseController<Member, MemberDto> {
   @Override
   protected Class<Member> getEntityClass() { return Member.class; }
   
-  // ══════════════════════════════════════
-  // ========== 비즈니스 로직 ==========
+  // ══════════비즈니스 로직═══════════════════
   // 1. GET /member-list?spaceId={spaceId} - 공간의 회원 목록 조회 (spaceId 필수)
   // ══════════════════════════════════════
   
