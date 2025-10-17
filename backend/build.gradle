@@ -45,6 +45,10 @@ dependencies {
     implementation 'org.apache.tika:tika-core:2.9.1'
     implementation 'org.apache.tika:tika-parsers-standard-package:2.9.1'
 
+    // Apache Commons Compress (압축 파일 검증 - 3단계 방어)
+    implementation 'org.apache.commons:commons-compress:1.25.0'
+    implementation 'org.tukaani:xz:1.9' // 7z, LZMA 지원
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
