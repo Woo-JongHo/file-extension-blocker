@@ -12,7 +12,7 @@ public interface BlockedExtensionService extends BaseService<BlockedExtension> {
   
   List<BlockedExtension> getCustomExtensions(Long spaceId);
   
-  void toggleFixedExtension(Long spaceId, String extension, Boolean isBlocked);
+  void toggleFixedExtension(Long spaceId, String extension);
   
   Long countCustomExtensions(Long spaceId);
 }

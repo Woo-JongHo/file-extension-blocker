@@ -150,36 +150,43 @@ CREATE TRIGGER trg_uploaded_file_update BEFORE UPDATE ON uploaded_file
 FOR EACH ROW EXECUTE FUNCTION trg_update_timestamp();
 
 -- =========================================================
--- 8. 공간 생성 시 Top-6 자동 삽입 함수
+-- 8. 공간 생성 시 Member + Space + Top-6 자동 생성 함수
 -- =========================================================
 CREATE OR REPLACE FUNCTION create_space_with_defaults(
   p_space_name VARCHAR(255),
-  p_creator_id BIGINT
+  p_admin_username VARCHAR(255),
+  p_admin_password VARCHAR(255),
+  p_description TEXT DEFAULT NULL
 ) RETURNS BIGINT LANGUAGE plpgsql AS $$
 DECLARE
+  v_member_id BIGINT;
   v_space_id BIGINT;
 BEGIN
-  -- 1. 공간 생성
-  INSERT INTO space (space_name, created_by, updated_by)
-  VALUES (p_space_name, p_creator_id, p_creator_id)
+  -- 1. Admin Member 생성 (space_id는 null, role은 ADMIN)
+  INSERT INTO member (username, password, role, space_id)
+  VALUES (p_admin_username, p_admin_password, 'ADMIN', NULL)
+  RETURNING member_id INTO v_member_id;
+  
+  -- 2. Space 생성
+  INSERT INTO space (space_name, description, created_by, updated_by)
+  VALUES (p_space_name, p_description, v_member_id, v_member_id)
   RETURNING space_id INTO v_space_id;
   
-  -- 2. 생성자를 ADMIN으로 등록 (Member 테이블의 space_id 업데이트)
+  -- 3. Member에 space_id 업데이트
   UPDATE member 
   SET space_id = v_space_id, 
-      role = 'ADMIN',
-      updated_by = p_creator_id,
+      updated_by = v_member_id,
       updated_at = now()
-  WHERE member_id = p_creator_id;
+  WHERE member_id = v_member_id;
   
-  -- 3. 고정 확장자 자동 삽입 (전역 Top-6, 기본 unCheck)
+  -- 4. 고정 확장자 자동 삽입 (전역 Top-6, 기본 unCheck)
   INSERT INTO blocked_extension (space_id, extension, is_fixed, created_by, updated_by, is_deleted)
   SELECT 
     v_space_id,
     extension,
     true,  -- is_fixed
-    p_creator_id,
-    p_creator_id,
+    v_member_id,
+    v_member_id,
     true   -- 기본 unCheck (is_deleted = true)
   FROM (
     SELECT extension, COUNT(*) as usage_count
@@ -194,7 +201,7 @@ BEGIN
   RETURN v_space_id;
 END $$;
 
-COMMENT ON FUNCTION create_space_with_defaults IS '공간 생성 시 Top-6 고정 확장자 자동 삽입 (실시간 집계)';
+COMMENT ON FUNCTION create_space_with_defaults IS 'Space 생성 시 Admin Member + Top-6 고정 확장자 자동 생성';
 
 -- ============================================
 -- 더미 데이터 삽입

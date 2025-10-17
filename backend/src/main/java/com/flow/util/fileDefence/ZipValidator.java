@@ -283,7 +283,7 @@ public class ZipValidator {
                 MAX_NESTING_DEPTH, fileName)
         );
       }
-    }
+    } 
   }
 
   /**

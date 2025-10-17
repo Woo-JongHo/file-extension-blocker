@@ -7,7 +7,6 @@ import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,10 +34,10 @@ public class MemberController extends BaseController<Member, MemberDto> {
   // ══════════════════════════════════════
   
   @GetMapping("/member-list")
-  public ResponseEntity<BaseResponse<List<MemberDto>>> getMembersBySpace(
+  public BaseResponse<List<MemberDto>> getMembersBySpace(
       @RequestParam Long spaceId) {
     List<Member> members = memberService.getMembersBySpace(spaceId);
-    return successResponse(toDtoList(members));
+    return BaseResponse.success(toDtoList(members), "멤버 목록 조회 완료");
   }
 }
 

@@ -40,12 +40,13 @@ public class BlockedExtensionServiceImpl extends BaseServiceImpl<BlockedExtensio
   }
 
   @Override
-  public void toggleFixedExtension(Long spaceId, String extension, Boolean isBlocked) {
+  public void toggleFixedExtension(Long spaceId, String extension) {
     BlockedExtension blockedExtension = blockedExtensionRepository
-        .findBySpaceIdAndExtensionAndIsDeletedFalse(spaceId, extension.toLowerCase())
+        .findBySpaceIdAndExtension(spaceId, extension.toLowerCase())
         .orElseThrow(() -> new IllegalArgumentException("고정 확장자를 찾을 수 없습니다: " + extension));
     
-    blockedExtension.setIsDeleted(!isBlocked);
+    // 현재 상태 반전 (isDeleted 토글)
+    blockedExtension.setIsDeleted(!blockedExtension.getIsDeleted());
     blockedExtensionRepository.save(blockedExtension);
   }
 

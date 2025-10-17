@@ -7,7 +7,6 @@ import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -31,12 +30,19 @@ public class SpaceController extends BaseController<Space, SpaceDto> {
   
   // ══════════비즈니스 로직═══════════════════
   // 1. GET /space-list - 모든 공간 조회
+  // 2. POST /{spaceId}/top6 - Top-6 고정 확장자 자동 삽입
   // ══════════════════════════════════════
   
   @GetMapping("/space-list")
-  public ResponseEntity<BaseResponse<List<SpaceDto>>> getAllSpaces() {
+  public BaseResponse<List<SpaceDto>> getAllSpaces() {
     List<Space> spaces = spaceService.getAllSpaces();
-    return successResponse(toDtoList(spaces));
+    return BaseResponse.success(toDtoList(spaces), "Space 목록 조회 완료");
+  }
+
+  @PostMapping("/{spaceId}/top6")
+  public BaseResponse<Void> insertTop6Extensions(@PathVariable Long spaceId, @RequestParam Long memberId) {
+    spaceService.insertTop6Extensions(spaceId, memberId);
+    return BaseResponse.success(null, "Top-6 고정 확장자 삽입 완료");
   }
 }
 

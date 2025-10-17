@@ -9,5 +9,7 @@ public interface SpaceService extends BaseService<Space> {
   List<Space> getAllSpaces();
   
   boolean existsBySpaceName(String spaceName);
+
+  void insertTop6Extensions(Long spaceId, Long memberId);
 }
 

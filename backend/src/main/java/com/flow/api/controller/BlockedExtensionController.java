@@ -7,13 +7,12 @@ import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/spaces/{spaceId}/blocked-extensions")
+@RequestMapping("/api/blocked-extensions")
 public class BlockedExtensionController extends BaseController<BlockedExtension, BlockedExtensionDto> {
 
   private final BlockedExtensionService blockedExtensionService;
@@ -39,36 +38,35 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
   // ══════════════════════════════════════
   
   @GetMapping("/block-list")
-  public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getBlockExtensionsBySpace(@PathVariable Long spaceId) {
+  public BaseResponse<List<BlockedExtensionDto>> getBlockExtensionsBySpace(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getBlockedExtensions(spaceId);
-    return successResponse(toDtoList(extensions));
+    return BaseResponse.success(toDtoList(extensions), "차단 확장자 목록 조회 완료");
   }
 
   @GetMapping("/fixed-block-list")
-  public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getFixedBlockExtensions(@PathVariable Long spaceId) {
+  public BaseResponse<List<BlockedExtensionDto>> getFixedBlockExtensions(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getFixedExtensions(spaceId);
-    return successResponse(toDtoList(extensions));
+    return BaseResponse.success(toDtoList(extensions), "고정 확장자 목록 조회 완료");
   }
 
   @GetMapping("/custom-block-list")
-  public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getCustomBlockExtensions(@PathVariable Long spaceId) {
+  public BaseResponse<List<BlockedExtensionDto>> getCustomBlockExtensions(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getCustomExtensions(spaceId);
-    return successResponse(toDtoList(extensions));
+    return BaseResponse.success(toDtoList(extensions), "커스텀 확장자 목록 조회 완료");
   }
 
   @PatchMapping("/fixed-change-status")
-  public ResponseEntity<BaseResponse<String>> changeFixedExtensionStatus(
-      @PathVariable Long spaceId,
-      @RequestParam String extension,
-      @RequestParam Boolean isBlocked) {
-    blockedExtensionService.toggleFixedExtension(spaceId, extension, isBlocked);
-    return successResponse("고정 확장자 상태 변경 완료");
+  public BaseResponse<Void> changeFixedExtensionStatus(
+      @RequestParam Long spaceId,
+      @RequestParam String extension) {
+    blockedExtensionService.toggleFixedExtension(spaceId, extension);
+    return BaseResponse.success(null, "고정 확장자 상태 변경 완료");
   }
 
   @GetMapping("/count-custom-block-list")
-  public ResponseEntity<BaseResponse<Long>> countCustomBlockExtensions(@PathVariable Long spaceId) {
+  public BaseResponse<Long> countCustomBlockExtensions(@RequestParam Long spaceId) {
     Long count = blockedExtensionService.countCustomExtensions(spaceId);
-    return successResponse(count);
+    return BaseResponse.success(count, "커스텀 확장자 개수 조회 완료");
   }
 }
 

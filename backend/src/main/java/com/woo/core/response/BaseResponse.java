@@ -47,6 +47,7 @@ import org.springframework.http.ResponseEntity;
 public class BaseResponse<T> {
   private String timestamp;
   private int status;
+  private String message;
   private T data;
   private String errorCode;
   private String errorDetail;
@@ -55,31 +56,58 @@ public class BaseResponse<T> {
     return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
   }
 
+  // BaseResponse 직접 반환
+  public static <T> BaseResponse<T> success(T data) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(200)
+        .message("요청이 성공적으로 처리되었습니다.")
+        .data(data)
+        .build();
+  }
+
+  public static <T> BaseResponse<T> success(T data, String message) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(200)
+        .message(message)
+        .data(data)
+        .build();
+  }
+
+  public static <T> BaseResponse<T> error(String errorCode, String errorDetail) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(400)
+        .message("요청 처리 중 오류가 발생했습니다.")
+        .errorCode(errorCode)
+        .errorDetail(errorDetail)
+        .build();
+  }
+
+  public static <T> BaseResponse<T> error(int status, String errorCode, String errorDetail) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(status)
+        .message("요청 처리 중 오류가 발생했습니다.")
+        .errorCode(errorCode)
+        .errorDetail(errorDetail)
+        .build();
+  }
+
+  // ResponseEntity 반환 (하위 호환성)
   public static <T> ResponseEntity<BaseResponse<T>> successResponse(T data) {
-    return ResponseEntity.ok(
-        BaseResponse.<T>builder().timestamp(now()).status(200).data(data).build());
-  }  public static <T> ResponseEntity<BaseResponse<T>> errorResponse(
+    return ResponseEntity.ok(success(data));
+  }
+
+  public static <T> ResponseEntity<BaseResponse<T>> errorResponse(
       String errorCode, String errorDetail) {
-    return ResponseEntity.badRequest()
-        .body(
-            BaseResponse.<T>builder()
-                .timestamp(now())
-                .status(400)
-                .errorCode(errorCode)
-                .errorDetail(errorDetail)
-                .build());
+    return ResponseEntity.badRequest().body(error(errorCode, errorDetail));
   }
 
   public static <T> ResponseEntity<BaseResponse<T>> errorResponse(
       int status, String errorCode, String errorDetail) {
-    return ResponseEntity.status(status)
-        .body(
-            BaseResponse.<T>builder()
-                .timestamp(now())
-                .status(status)
-                .errorCode(errorCode)
-                .errorDetail(errorDetail)
-                .build());
+    return ResponseEntity.status(status).body(error(status, errorCode, errorDetail));
   }
 
   public static ResponseEntity<byte[]> pdf(byte[] pdfBytes, String fileName) {

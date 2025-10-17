@@ -18,6 +18,10 @@ public class SpaceDto implements Identifiable {
   private Long spaceId;
   private String spaceName;
   private String description;
+  private String adminUsername;
+  private String adminPassword;
+  private Long createdBy;
+  private Long updatedBy;
   private LocalDateTime createdAt;
 
   @Override
