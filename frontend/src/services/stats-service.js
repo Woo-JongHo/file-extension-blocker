@@ -6,12 +6,12 @@ const statsService = {
     try {
       const [filesResponse, extensionsResponse] = await Promise.all([
         api.get('/api/uploaded-files/count', { params: { spaceId } }),
-        api.get('/api/blocked-extensions/block-list', { params: { spaceId } })
+        api.get('/api/blocked-extensions/count-custom-block-list', { params: { spaceId } })
       ]);
 
       return {
         fileCount: filesResponse.data || 0,
-        extensionCount: extensionsResponse.data?.length || 0
+        extensionCount: extensionsResponse.data || 0
       };
     } catch (err) {
       console.error('통계 조회 실패:', err);
