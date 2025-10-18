@@ -21,16 +21,11 @@ const spaceService = {
 
   // Space + Admin Member + 고정 확장자 동시 생성 (권장)
   createSpaceWithAdmin: async ({ spaceName, description, adminUsername, adminPassword }) => {
-    const params = new URLSearchParams();
-    params.append('spaceName', spaceName);
-    params.append('description', description);
-    params.append('adminUsername', adminUsername);
-    params.append('adminPassword', adminPassword);
-    
-    const baseResponse = await api.post('/api/spaces/create-with-admin', params, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    const baseResponse = await api.post('/api/spaces/create-with-admin', {
+      spaceName,
+      description,
+      adminUsername,
+      adminPassword
     });
     return baseResponse;
   },

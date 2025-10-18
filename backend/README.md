@@ -45,7 +45,7 @@
 │  │  Spring Boot Application                   │    │
 │  │  - Host: 0.0.0.0                          │    │
 │  │  - Port: 8800                             │    │
-│  │  - External IP: 121.131.186.71            │    │
+│  │  - External IP: 121.131.197.71            │    │
 │  └────────────┬───────────────────────────────┘    │
 │               │                                      │
 │               ↓                                      │
@@ -67,7 +67,7 @@
 
 | 서비스 | 내부 포트 | 외부 포트 | 접속 URL |
 |--------|----------|----------|----------|
-| Spring Boot | 8800 | 8800 | http://121.131.186.71:8800 |
+| Spring Boot | 8800 | 8800 | http://121.131.197.71:8800 |
 | PostgreSQL | 5432 | 5445 | localhost:5445 |
 
 ---
@@ -344,7 +344,7 @@ http://localhost:8800/swagger-ui/index.html
 
 외부 접속:
 ```
-http://121.131.186.71:8800/swagger-ui/index.html
+http://121.131.197.71:8800/swagger-ui/index.html
 ```
 
 ---

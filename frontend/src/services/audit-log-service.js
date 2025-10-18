@@ -29,7 +29,7 @@ export const auditLogService = {
    * SSE 스트림 연결
    */
   connectToLogStream: () => {
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8800';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://121.131.197.71:8800';
     return new EventSource(`${baseURL}/api/logs/stream`);
   },
 
