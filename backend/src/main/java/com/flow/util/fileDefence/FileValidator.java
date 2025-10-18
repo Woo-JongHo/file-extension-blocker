@@ -137,33 +137,35 @@ public class FileValidator {
    *
    * <p>방어 시나리오:
    * <pre>
-   * 공격: malware.exe -> malware.jpg (확장자만 변경)
+   * 공격 1: malware.exe -> malware.jpg (확장자만 변경)
    * 1단계: 확장자 .jpg -> 통과 (Blacklist에 없음)
    * 2단계: Tika 매직 넘버 분석 -> "4D 5A" (PE 실행 파일) 감지 -> 차단됨
-   * </pre>
-   *
-   * <p>한계:
-   * <pre>
-   * 공격: script.bat -> script.jpg (텍스트 스크립트)
-   * 2단계: Tika 매직 넘버 분석 -> 매직 넘버 없음 (일반 텍스트) -> 통과
-   * 한계: 텍스트 기반 스크립트(.bat, .cmd, .sh)는 매직 넘버가 없어 감지 불가
-   * 보완: 1단계 확장자 Blacklist가 주 방어선 역할
+   * 
+   * 공격 2: script.sh -> fake-image.jpg (텍스트 스크립트)
+   * 1단계: 확장자 .jpg -> 통과 (Blacklist에 없음)
+   * 2단계: Tika MIME 분석 -> text/plain 감지, .jpg는 image/* 이어야 함 -> MIME 불일치 차단
    * </pre>
    *
    * @param file 업로드 파일
    * @param extension 1단계에서 추출한 확장자
-   * @throws IllegalArgumentException 실행 파일 감지 시
+   * @throws IllegalArgumentException 실행 파일 감지 또는 MIME 타입 불일치 시
    * @throws RuntimeException Tika 분석 실패 시
    */
   private void validate2ndDefense(MultipartFile file, String extension) {
     try (InputStream inputStream = file.getInputStream()) {
       String detectedMimeType = tika.detect(inputStream, file.getOriginalFilename());
+      
+      log.debug("파일: {}, 확장자: {}, 감지된 MIME: {}", 
+          file.getOriginalFilename(), extension, detectedMimeType);
 
-      // 실행 파일 감지 (바이너리 실행 파일만 차단)
+      // 2-1. 실행 파일 감지 (바이너리 실행 파일 차단)
       if (isExecutableFile(detectedMimeType)) {
         throw new IllegalArgumentException(
             String.format("실행 파일은 업로드할 수 없습니다. 감지된 타입: %s", detectedMimeType));
       }
+
+      // 2-2. MIME 타입 불일치 검증 (확장자 위장 차단)
+      validateMimeTypeConsistency(extension, detectedMimeType, file.getOriginalFilename());
 
     } catch (IOException e) {
       throw new RuntimeException("파일 형식 검증 중 오류가 발생했습니다.", e);
@@ -193,6 +195,80 @@ public class FileValidator {
     }
 
     return EXECUTABLE_MIME_TYPES.contains(mimeType.toLowerCase());
+  }
+
+  /**
+   * MIME 타입 일관성 검증 (확장자 위장 차단)
+   *
+   * <p>Apache Tika의 MimeTypes 데이터베이스를 사용하여 확장자와 실제 파일의 MIME 타입이 일치하는지 검증합니다.
+   * <p>예: .jpg 확장자인데 text/plain이면 차단
+   *
+   * @param extension 파일 확장자
+   * @param detectedMimeType Tika가 감지한 MIME 타입
+   * @param fileName 파일명 (로깅용)
+   * @throws IllegalArgumentException MIME 타입 불일치 시
+   */
+  private void validateMimeTypeConsistency(String extension, String detectedMimeType, String fileName) {
+    if (detectedMimeType == null || extension == null || extension.isEmpty()) {
+      return;
+    }
+    
+    try {
+      // Tika의 내장 데이터베이스에서 확장자에 대한 예상 MIME 타입 조회
+      String dummyFileName = "file." + extension.toLowerCase();
+      String expectedMimeString = tika.detect(dummyFileName);
+      
+      // 일반적인 카테고리 매칭 (image/*, video/*, audio/* 등)
+      String detectedCategory = getMimeCategory(detectedMimeType);
+      String expectedCategory = getMimeCategory(expectedMimeString);
+      
+      // application/octet-stream은 Tika가 알 수 없는 파일 타입이므로 검증 스킵
+      if ("application/octet-stream".equals(expectedMimeString)) {
+        log.debug("알 수 없는 확장자, MIME 검증 스킵: {}", extension);
+        return;
+      }
+      
+      // MIME 카테고리가 일치하는지 확인
+      if (!detectedCategory.equals(expectedCategory)) {
+        log.warn("MIME 타입 불일치 감지 - 파일: {}, 확장자: {}, 예상: {} ({}), 실제: {} ({})", 
+            fileName, extension, expectedMimeString, expectedCategory, detectedMimeType, detectedCategory);
+        throw new IllegalArgumentException(
+            String.format("파일 형식이 올바르지 않습니다. (확장자: .%s, 예상: %s, 실제: %s)", 
+                extension, expectedCategory, detectedCategory));
+      }
+      
+    } catch (IllegalArgumentException e) {
+      // 검증 실패는 그대로 전파
+      throw e;
+    } catch (Exception e) {
+      // 기타 예외는 로깅만 하고 통과 (너무 엄격하면 정상 파일도 차단될 수 있음)
+      log.debug("MIME 검증 중 예외 발생, 검증 스킵: {}", extension, e);
+    }
+  }
+  
+  /**
+   * MIME 타입에서 주요 카테고리 추출
+   *
+   * <p>예: "image/jpeg" → "image", "application/pdf" → "application/pdf"
+   *
+   * @param mimeType MIME 타입
+   * @return MIME 카테고리
+   */
+  private String getMimeCategory(String mimeType) {
+    if (mimeType == null) {
+      return "unknown";
+    }
+    
+    // 특정 MIME 타입은 전체 매칭 (너무 세분화된 타입)
+    if (mimeType.equals("application/pdf") 
+        || mimeType.equals("application/json") 
+        || mimeType.equals("application/xml")) {
+      return mimeType;
+    }
+    
+    // 일반적인 경우 주요 카테고리만 추출 (image/*, video/*, audio/*, text/* 등)
+    int slashIndex = mimeType.indexOf('/');
+    return slashIndex > 0 ? mimeType.substring(0, slashIndex + 1) + "*" : mimeType;
   }
 
   /**

@@ -1,7 +1,9 @@
 package com.flow.api.controller;
 
+import com.woo.core.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -12,13 +14,12 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
- * 실시간 로그 스트리밍 컨트롤러 (SSE)
+ * 로그 조회 컨트롤러
  *
- * <p>application.log 파일을 실시간으로 스트리밍한다.
+ * <p>application.log 파일 조회 및 실시간 스트리밍(SSE) 기능 제공
  */
 @Slf4j
 @RestController
@@ -26,7 +27,6 @@ import java.util.concurrent.Executors;
 public class LogStreamController {
 
   private final CopyOnWriteArrayList<SseEmitter> emitters = new CopyOnWriteArrayList<>();
-  private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
   @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public SseEmitter streamLogs() {
@@ -50,21 +50,35 @@ public class LogStreamController {
   }
 
 
+  /**
+   * 로그 파일 조회 (최근 N줄)
+   * 
+   * @param lines 조회할 라인 수 (기본 100줄)
+   * @return 로그 파일 내용
+   */
   @GetMapping("/file")
-  public String getLogFile(@RequestParam(defaultValue = "100") int lines) {
+  public ResponseEntity<BaseResponse<String>> getLogFile(@RequestParam(defaultValue = "100") int lines) {
     try {
       Path logPath = Paths.get("./logs/app.log");
       if (!Files.exists(logPath)) {
-        return "로그 파일이 아직 생성되지 않았습니다.";
+        return BaseResponse.successResponse("로그 파일이 아직 생성되지 않았습니다.", "로그 조회 완료");
       }
 
-      return Files.lines(logPath)
-          .skip(Math.max(0, Files.lines(logPath).count() - lines))
-          .reduce("", (a, b) -> a + b + "\n");
+      // 전체 라인 수 계산
+      long totalLines = Files.lines(logPath).count();
+      long skipLines = Math.max(0, totalLines - lines);
+      
+      // 최근 N줄 읽기
+      String logContent = Files.lines(logPath)
+          .skip(skipLines)
+          .collect(Collectors.joining("\n"));
+
+      return BaseResponse.successResponse(logContent, 
+          String.format("로그 조회 완료 (총 %d줄 중 최근 %d줄)", totalLines, Math.min(lines, totalLines)));
 
     } catch (IOException e) {
       log.error("로그 파일 읽기 실패", e);
-      return "로그 파일 읽기 실패: " + e.getMessage();
+      return BaseResponse.errorResponse("로그 파일 읽기 실패: " + e.getMessage(), "LOG_READ_FAILED");
     }
   }
 

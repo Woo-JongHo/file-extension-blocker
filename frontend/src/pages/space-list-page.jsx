@@ -61,37 +61,21 @@ const SpaceListPage = () => {
 
   const handleCreateSpace = async (formData) => {
     try {
-      // 1. Admin Member 생성
-      const { data: member } = await memberService.createMember({
-        username: formData.adminUsername,
-        password: formData.adminPassword,
-        role: 'ADMIN',
-        spaceId: null
-      });
-
-      // 2. Space 생성
-      const { data: space } = await spaceService.createSpace({
+      // Space + Admin Member + 고정 확장자 7개를 트랜잭션으로 한 번에 생성
+      const { data } = await spaceService.createSpaceWithAdmin({
         spaceName: formData.spaceName,
         description: formData.description,
-        createdBy: member.memberId,
-        updatedBy: member.memberId
+        adminUsername: formData.adminUsername,
+        adminPassword: formData.adminPassword
       });
-
-      // 3. Member에 spaceId 업데이트
-      await memberService.updateMember(member.memberId, {
-        ...member,
-        spaceId: space.spaceId
-      });
-
-      // 4. Top-6 고정 확장자 자동 삽입
-      await spaceService.insertTop6Extensions(space.spaceId, member.memberId);
 
       alert(
         `✅ Space 생성 완료!\n\n` +
-        `📁 Space: ${formData.spaceName}\n` +
-        `👤 관리자: ${formData.adminUsername}\n` +
-        `🔑 비밀번호: 1234\n\n` +
-        `💡 Top-6 고정 확장자가 자동으로 추가되었습니다!`
+        `📁 Space: ${data.space.spaceName}\n` +
+        `👤 관리자: ${data.adminMember.username}\n` +
+        `🔑 비밀번호: ${formData.adminPassword}\n\n` +
+        `🛡️ 고정 확장자 ${data.fixedExtensionsCount}개가 자동으로 추가되었습니다!\n` +
+        `(기본 비활성화 상태 - 필요한 확장자만 체크하여 활성화하세요)`
       );
 
       setIsModalOpen(false);
@@ -144,12 +128,20 @@ const SpaceListPage = () => {
               파일 확장자 차단 시스템 - Space 선택
             </p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all"
-          >
-            + 새 Space 생성
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate('/logs')}
+              className="px-6 py-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white font-semibold rounded-lg hover:from-gray-800 hover:to-gray-900 shadow-md hover:shadow-lg transition-all"
+            >
+              📋 로그 보기
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all"
+            >
+              + 새 Space 생성
+            </button>
+          </div>
         </div>
 
         {/* 설명 섹션 */}
@@ -240,7 +232,12 @@ const SpaceListPage = () => {
                 <div>
                   <a href={`${API_BASE_URL}/api/test-files/download/3-disguised/fake-image.jpg`}
                      className="text-xs text-blue-600 hover:underline font-medium">fake-image.jpg</a>
-                  <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - MIME 타입 불일치</p>
+                  <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - .sh 스크립트 위장 (MIME: application/x-sh)</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/3-disguised/fake-image-bat.jpg`}
+                     className="text-xs text-blue-600 hover:underline font-medium">fake-image-bat.jpg</a>
+                  <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - .bat 스크립트 위장 (MIME: text/plain)</p>
                 </div>
               </div>
             </div>

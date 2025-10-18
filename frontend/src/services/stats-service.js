@@ -1,12 +1,12 @@
 import api from '@/services/api';
 
 const statsService = {
-  // Space별 통계 조회 (파일 수 + 확장자 수)
+  // Space별 통계 조회 (파일 수 + 활성화된 전체 확장자 수)
   getSpaceStats: async (spaceId) => {
     try {
       const [filesResponse, extensionsResponse] = await Promise.all([
         api.get('/api/uploaded-files/count', { params: { spaceId } }),
-        api.get('/api/blocked-extensions/count-custom-block-list', { params: { spaceId } })
+        api.get('/api/blocked-extensions/count-active', { params: { spaceId } })
       ]);
 
       return {

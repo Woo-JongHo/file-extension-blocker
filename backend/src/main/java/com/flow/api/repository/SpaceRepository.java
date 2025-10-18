@@ -9,6 +9,12 @@ import java.util.List;
 @Repository
 public interface SpaceRepository extends BaseRepository<Space, Long> {
   
+  // ══════════════════════════════════════
+  // ========== 조회 메서드 ==========
+  // 1. 모든 Space 목록 조회 - findByIsDeletedFalse
+  // 2. Space명 중복 확인 - existsBySpaceNameAndIsDeletedFalse
+  // ══════════════════════════════════════
+  
   // 모든 공간 조회 (삭제되지 않은 것만)
   // SELECT * FROM space WHERE is_deleted = false
   List<Space> findByIsDeletedFalse();

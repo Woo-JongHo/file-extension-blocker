@@ -102,8 +102,11 @@ public class ZipValidator {
    * @throws IllegalArgumentException 검증 실패 시
    */
   public void validateZipFile(MultipartFile file, int currentDepth) {
+    log.info("[3단계-ZIP] 압축 파일 검증 시작 - 파일: {}, 깊이: {}", file.getOriginalFilename(), currentDepth);
+    
     // 1. 중첩 깊이 확인
     if (currentDepth > MAX_NESTING_DEPTH) {
+      log.warn("[3단계-ZIP] 차단! - 중첩 깊이 초과: {} > {}", currentDepth, MAX_NESTING_DEPTH);
       throw new IllegalArgumentException(
           String.format("압축 파일 중첩 깊이가 %d단계를 초과했습니다.", MAX_NESTING_DEPTH)
       );
@@ -112,12 +115,14 @@ public class ZipValidator {
     try (InputStream inputStream = new BufferedInputStream(file.getInputStream())) {
       // 2. MIME Type으로 압축 포맷 감지
       String mimeType = tika.detect(inputStream);
+      log.info("[3단계-ZIP] 감지된 MIME 타입: {}", mimeType);
 
       // 3. 압축 포맷에 맞는 스트림 생성
       try (ArchiveInputStream<?> archiveInputStream = createArchiveInputStream(
           file.getInputStream(), mimeType)) {
         
         if (archiveInputStream == null) {
+          log.info("[3단계-ZIP] 압축 파일 아님, 검증 스킵");
           return; // 압축 파일이 아니면 패스
         }
 
@@ -125,8 +130,11 @@ public class ZipValidator {
       }
 
     } catch (IOException e) {
+      log.error("[3단계-ZIP] 오류 발생: {}", e.getMessage());
       throw new IllegalArgumentException("압축 파일 검증 중 오류 발생: " + e.getMessage(), e);
     }
+    
+    log.info("[3단계-ZIP] 압축 파일 검증 완료!");
   }
 
   /**
@@ -170,6 +178,8 @@ public class ZipValidator {
       long compressedSize,
       int currentDepth) throws IOException {
     
+    log.info("[3단계-ZIP] 압축 엔트리 검증 시작 - 압축 크기: {} bytes", compressedSize);
+    
     long totalUncompressedSize = 0;
     int fileCount = 0;
 
@@ -182,10 +192,13 @@ public class ZipValidator {
 
       String fileName = entry.getName();
       long entrySize = entry.getSize();
+      
+      log.info("[3단계-ZIP] 내부 파일 발견: {} (크기: {} bytes)", fileName, entrySize);
 
       // 1. 파일 개수 제한
       fileCount++;
       if (fileCount > MAX_FILE_COUNT) {
+        log.warn("[3단계-ZIP] 차단! - 파일 개수 초과: {} > {}", fileCount, MAX_FILE_COUNT);
         throw new IllegalArgumentException(
             String.format("압축 파일 내부 파일 개수가 %d개를 초과했습니다.", MAX_FILE_COUNT)
         );
@@ -195,6 +208,8 @@ public class ZipValidator {
       if (entrySize > 0) {
         totalUncompressedSize += entrySize;
         if (totalUncompressedSize > MAX_UNCOMPRESSED_SIZE) {
+          log.warn("[3단계-ZIP] 차단! - 압축 해제 크기 초과: {} > {}", 
+              totalUncompressedSize, MAX_UNCOMPRESSED_SIZE);
           throw new IllegalArgumentException(
               String.format("압축 해제 크기가 %dMB를 초과했습니다. (Zip Bomb 의심)",
                   MAX_UNCOMPRESSED_SIZE / (1024 * 1024))
@@ -208,6 +223,8 @@ public class ZipValidator {
       // 4. 내부 파일 검증 (확장자 + 매직바이트 + 재귀 압축)
       validateInnerFile(fileName, fileContent, currentDepth);
     }
+
+    log.info("[3단계-ZIP] 총 파일 개수: {}, 총 압축 해제 크기: {} bytes", fileCount, totalUncompressedSize);
 
     // 5. Zip Bomb 최종 확인
     checkZipBomb(compressedSize, totalUncompressedSize);
@@ -253,37 +270,49 @@ public class ZipValidator {
    * @throws IllegalArgumentException 검증 실패 시
    */
   private void validateInnerFile(String fileName, byte[] fileContent, int currentDepth) {
+    log.info("[3단계-ZIP] 내부 파일 검증: {}", fileName);
+    
     // 1. 확장자 추출
     String extension = extractExtension(fileName);
+    log.debug("[3단계-ZIP]   확장자: {}", extension);
     
     // 2. 확장자 Blacklist 확인 (1단계 방어)
     if (blockedExtensions.contains(extension.toLowerCase())) {
+      log.warn("[3단계-ZIP] 차단! - 압축 내부에 차단된 확장자: {} ({})", fileName, extension);
       throw new IllegalArgumentException(
           String.format("압축 파일 내부에 차단된 확장자 파일이 있습니다: %s (%s)", fileName, extension)
       );
     }
+    log.debug("[3단계-ZIP]   확장자 검증 통과");
 
     // 3. 매직바이트 검증 (2단계 방어)
     String detectedMimeType = tika.detect(fileContent, fileName);
+    log.debug("[3단계-ZIP]   감지된 MIME: {}", detectedMimeType);
 
     // 실행 파일 감지
     if (detectedMimeType.contains("application/x-msdownload") ||  // .exe
         detectedMimeType.contains("application/x-executable") ||  // Linux ELF
         detectedMimeType.contains("application/x-mach-binary")) { // macOS Mach-O
+      log.warn("[3단계-ZIP] 차단! - 압축 내부에 실행 파일: {} ({})", fileName, detectedMimeType);
       throw new IllegalArgumentException(
           String.format("압축 파일 내부에 실행 파일이 있습니다: %s (%s)", fileName, detectedMimeType)
       );
     }
+    log.debug("[3단계-ZIP]   실행 파일 아님");
 
     // 4. 중첩 압축 파일 재귀 검증 (3단계 방어)
     if (ARCHIVE_MIME_TYPES.contains(detectedMimeType)) {
+      log.info("[3단계-ZIP] 중첩 압축 파일 감지: {} (깊이: {})", fileName, currentDepth + 1);
       if (currentDepth + 1 > MAX_NESTING_DEPTH) {
+        log.warn("[3단계-ZIP] 차단! - 중첩 깊이 초과: {} > {}", currentDepth + 1, MAX_NESTING_DEPTH);
         throw new IllegalArgumentException(
             String.format("중첩 압축 파일 깊이가 %d단계를 초과했습니다: %s", 
                 MAX_NESTING_DEPTH, fileName)
         );
       }
-    } 
+    }
+    
+    log.debug("[3단계-ZIP]   내부 파일 검증 완료: {}", fileName);
   }
 
   /**
@@ -296,18 +325,26 @@ public class ZipValidator {
    * @throws IllegalArgumentException Zip Bomb 감지 시
    */
   private void checkZipBomb(long compressedSize, long uncompressedSize) {
+    log.info("[3단계-ZIP] Zip Bomb 검사 - 압축: {} bytes, 해제: {} bytes", 
+        compressedSize, uncompressedSize);
+    
     if (compressedSize == 0 || uncompressedSize == 0) {
+      log.debug("[3단계-ZIP] 크기 정보 없음, Zip Bomb 검사 스킵");
       return; // 크기 정보 없음
     }
 
     int compressionRatio = (int) (uncompressedSize / compressedSize);
+    log.info("[3단계-ZIP] 압축률: {}배 (최대 허용: {}배)", compressionRatio, MAX_COMPRESSION_RATIO);
     
     if (compressionRatio > MAX_COMPRESSION_RATIO) {
+      log.warn("[3단계-ZIP] 차단! - Zip Bomb 감지: 압축률 {}배 초과", compressionRatio);
       throw new IllegalArgumentException(
           String.format("비정상적인 압축률 감지: %d배 (최대: %d배). Zip Bomb 의심!",
               compressionRatio, MAX_COMPRESSION_RATIO)
       );
     }
+    
+    log.info("[3단계-ZIP] Zip Bomb 검사 통과!");
   }
 
   /**

@@ -52,6 +52,14 @@ const blockedExtensionService = {
     });
     return baseResponse;
   },
+
+  // 활성화된 전체 확장자 개수 조회 (고정 + 커스텀)
+  countActiveExtensions: async (spaceId) => {
+    const baseResponse = await api.get('/api/blocked-extensions/count-active', {
+      params: { spaceId }
+    });
+    return baseResponse;
+  },
 };
 
 export default blockedExtensionService;

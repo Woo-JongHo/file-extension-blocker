@@ -5,11 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-/**
- * 공간별 차단 확장자 정책 (고정 + 커스텀)
- * - 고정 확장자 (is_fixed = true): Top-6, 체크/언체크만 가능, 삭제 불가
- * - 커스텀 확장자 (is_fixed = false): 사용자 추가, 최대 200개
- */
+
 @Entity
 @Table(
   name = "blocked_extension",

@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-/**
- * 시스템 사용자
- */
+
 @Entity
 @Table(name = "member")
 @Getter

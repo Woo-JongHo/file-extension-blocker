@@ -51,61 +51,63 @@ const FileListSection = ({ spaceId, refreshKey }) => {
         📁 업로드된 파일 ({files.length}개)
       </h2>
 
-      {loading ? (
-        <p className="text-gray-500">로딩 중...</p>
-      ) : files.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  파일명
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  확장자
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  크기
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  업로드 일시
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  액션
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {files.map((file) => (
-                <tr key={file.fileId} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {file.originalName}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    .{file.extension}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {formatFileSize(file.fileSize)}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {formatDate(file.createdAt)}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <button
-                      onClick={() => handleDelete(file.fileId)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      삭제
-                    </button>
-                  </td>
+      <div className="min-h-[120px] flex items-center">
+        {loading ? (
+          <p className="text-gray-500">로딩 중...</p>
+        ) : files.length > 0 ? (
+          <div className="overflow-x-auto w-full">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    파일명
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    확장자
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    크기
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    업로드 일시
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    액션
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-gray-400">업로드된 파일이 없습니다.</p>
-      )}
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {files.map((file) => (
+                  <tr key={file.fileId} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm text-gray-900">
+                      {file.originalName}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      .{file.extension}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {formatFileSize(file.fileSize)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {formatDate(file.createdAt)}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <button
+                        onClick={() => handleDelete(file.fileId)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        삭제
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-gray-400">업로드된 파일이 없습니다.</p>
+        )}
+      </div>
     </div>
   );
 };

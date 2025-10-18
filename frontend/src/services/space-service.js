@@ -19,7 +19,18 @@ const spaceService = {
     return baseResponse;
   },
 
-  // Top-6 고정 확장자 자동 삽입
+  // Space + Admin Member + 고정 확장자 동시 생성 (권장)
+  createSpaceWithAdmin: async ({ spaceName, description, adminUsername, adminPassword }) => {
+    const baseResponse = await api.post('/api/spaces/create-with-admin', {
+      spaceName,
+      description,
+      adminUsername,
+      adminPassword
+    });
+    return baseResponse;
+  },
+
+  // Top-6 고정 확장자 자동 삽입 (레거시)
   insertTop6Extensions: async (spaceId, memberId) => {
     const baseResponse = await api.post(`/api/spaces/${spaceId}/top6?memberId=${memberId}`);
     return baseResponse;

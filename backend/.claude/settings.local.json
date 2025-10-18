@@ -1,27 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git rm:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(docker compose:*)",
-      "Read(//Users/woojongho/Desktop/Project/file-extension-blocker/**)",
-      "Bash(docker exec backend-postgres-1 psql -U postgres -c \"\\l\")",
-      "Bash(docker exec backend-postgres-1 psql -U root -c \"\\du\")",
-      "Bash(dd if=/dev/zero of=huge.txt bs=1m count=15)",
-      "Bash(zip -9 zipbomb.zip huge.txt)",
-      "Bash(rm huge.txt)",
-      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/normal.zip .)",
-      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/malicious.zip .)",
-      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/zipbomb.zip .)",
-      "Bash(rm /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/test-files/3-disguised/fake-script.sh)",
-      "Bash(rm -f README.md generate-test-files.ps1 3-disguised/README.md 4-archive/*.md)",
-      "Bash(find . -type f ( -name \"*.md\" -o -name \"*.ps1\" ))",
-      "Bash(git log --all --full-history --source --oneline -- src/main/java/com/woo/core/controller/BaseController.java)",
-      "Bash(diskutil list)",
-      "Bash(diskutil rename \"USB_2TB_우종호\" \"USB_WOO_2TB\")",
-      "Bash(diskutil rename disk6s1 \"USB_WOO_2TB\")"
+      "Bash(docker exec backend-postgres-1 psql -U postgres -d file_extension_blocker -c \"\nSELECT \n    s.space_id, \n    s.space_name, \n    COUNT(be.blocked_id) as fixed_extensions_count \nFROM space s \nLEFT JOIN blocked_extension be ON s.space_id = be.space_id AND be.is_fixed = true AND be.is_deleted = false \nWHERE s.is_deleted = false \nGROUP BY s.space_id, s.space_name \nORDER BY s.space_id;\n\")",
+      "Bash(docker exec backend-postgres-1 psql -U postgres -d file_extension_blocker -c \"\nSELECT space_id, extension, is_fixed \nFROM blocked_extension \nWHERE space_id = 1 AND is_fixed = true \nORDER BY extension;\n\")",
+      "Bash(docker exec backend-postgres-1 psql -U postgres -d file_extension_blocker -c \"SELECT space_id, extension, is_fixed FROM blocked_extension WHERE is_fixed = false ORDER BY space_id, extension;\")",
+      "Bash(docker exec backend-postgres-1 psql -U postgres -d file_extension_blocker -c \"SELECT extension, COUNT(*) as cnt FROM blocked_extension WHERE is_deleted = false GROUP BY extension ORDER BY cnt DESC LIMIT 6;\")",
+      "Bash(docker exec backend-postgres-1 psql -U postgres -d file_extension_blocker -c \"SELECT s.space_id, s.space_name, COUNT(be.blocked_id) as fixed_extensions_count FROM space s LEFT JOIN blocked_extension be ON s.space_id = be.space_id AND be.is_fixed = true WHERE s.is_deleted = false GROUP BY s.space_id, s.space_name ORDER BY s.space_id;\")"
     ],
-    "deny": []
+    "deny": [],
+    "ask": []
   }
 }

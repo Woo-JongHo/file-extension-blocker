@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import blockedExtensionService from '@/services/blocked-extension-service';
 
-const CustomExtensionSection = ({ spaceId, onRefresh, refreshKey }) => {
+const CustomExtensionSection = ({ spaceId, onRefresh, refreshKey, isAdmin = true }) => {
   const [customExtensions, setCustomExtensions] = useState([]);
   const [newExtension, setNewExtension] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,56 +74,69 @@ const CustomExtensionSection = ({ spaceId, onRefresh, refreshKey }) => {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">
-        ➕ 커스텀 확장자 (최대 200개)
-      </h2>
-
-      {/* 확장자 추가 */}
-      <div className="mb-4 flex gap-2">
-        <input
-          type="text"
-          value={newExtension}
-          onChange={(e) => setNewExtension(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
-          placeholder="예: php, jsp, asp"
-          maxLength={20}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={handleAdd}
-          disabled={adding}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-        >
-          {adding ? '추가 중...' : '추가'}
-        </button>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold text-gray-900">
+          ➕ 커스텀 확장자 {isAdmin && '(최대 200개)'}
+        </h2>
+        {!isAdmin && (
+          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            읽기 전용
+          </span>
+        )}
       </div>
 
-      {/* 커스텀 확장자 목록 */}
-      {loading ? (
-        <p className="text-gray-500">로딩 중...</p>
-      ) : customExtensions.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {customExtensions.map((item) => (
-            <div
-              key={item.blockedId}
-              className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded"
-            >
-              <span className="text-sm text-gray-700">
-                {item.extension}
-              </span>
-              <button
-                onClick={() => handleDelete(item.blockedId)}
-                className="text-red-600 hover:text-red-800"
-                title="삭제"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
+      {/* 확장자 추가 (관리자만) */}
+      {isAdmin && (
+        <div className="mb-4 flex gap-2">
+          <input
+            type="text"
+            value={newExtension}
+            onChange={(e) => setNewExtension(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
+            placeholder="예: php, jsp, asp"
+            maxLength={20}
+            className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            onClick={handleAdd}
+            disabled={adding}
+            className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {adding ? '추가 중...' : '추가'}
+          </button>
         </div>
-      ) : (
-        <p className="text-gray-400 text-sm">커스텀 확장자가 없습니다.</p>
       )}
+
+      {/* 커스텀 확장자 목록 */}
+      <div className="min-h-[80px] flex items-center">
+        {loading ? (
+          <p className="text-gray-500">로딩 중...</p>
+        ) : customExtensions.length > 0 ? (
+          <div className="flex flex-wrap gap-2 w-full">
+            {customExtensions.map((item) => (
+              <div
+                key={item.blockedId}
+                className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded"
+              >
+                <span className="text-sm text-gray-700">
+                  {item.extension}
+                </span>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDelete(item.blockedId)}
+                    className="text-red-600 hover:text-red-800"
+                    title="삭제"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-400 text-sm">커스텀 확장자가 없습니다.</p>
+        )}
+      </div>
     </div>
   );
 };

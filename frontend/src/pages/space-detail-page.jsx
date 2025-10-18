@@ -58,22 +58,20 @@ const SpaceDetailPage = () => {
       {/* 메인 컨텐츠 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         
-        {/* 고정 확장자 섹션 (관리자만) */}
-        {isAdmin && (
-          <FixedExtensionSection 
-            spaceId={spaceId} 
-            refreshKey={refreshKey}
-          />
-        )}
+        {/* 고정 확장자 섹션 (모든 사용자) */}
+        <FixedExtensionSection 
+          spaceId={spaceId} 
+          refreshKey={refreshKey}
+          isAdmin={isAdmin}
+        />
 
-        {/* 커스텀 확장자 섹션 (관리자만) */}
-        {isAdmin && (
-          <CustomExtensionSection 
-            spaceId={spaceId} 
-            onRefresh={handleRefresh}
-            refreshKey={refreshKey}
-          />
-        )}
+        {/* 커스텀 확장자 섹션 (모든 사용자) */}
+        <CustomExtensionSection 
+          spaceId={spaceId} 
+          onRefresh={handleRefresh}
+          refreshKey={refreshKey}
+          isAdmin={isAdmin}
+        />
 
         {/* 파일 업로드 섹션 (모든 사용자) */}
         <FileUploadSection 

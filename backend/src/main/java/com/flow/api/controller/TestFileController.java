@@ -54,7 +54,8 @@ public class TestFileController {
     ));
 
     fileMap.put("3-disguised", List.of(
-        "fake-image.jpg"
+        "fake-image.jpg",
+        "fake-image-bat.jpg"
     ));
 
     fileMap.put("4-archive", List.of(
@@ -98,11 +99,7 @@ public class TestFileController {
     }
   }
 
-  /**
-   * 카테고리 정보 조회
-   *
-   * @return 카테고리 설명
-   */
+
   @GetMapping("/categories")
   public ResponseEntity<BaseResponse<Map<String, String>>> getCategories() {
     Map<String, String> categories = new HashMap<>();

@@ -15,6 +15,7 @@ public class BlockedExtensionDto implements Identifiable {
   private Long spaceId;
   private String extension;
   private Boolean isFixed;
+  private Boolean isDeleted;
   private Boolean isBlocked;
 
   @Override

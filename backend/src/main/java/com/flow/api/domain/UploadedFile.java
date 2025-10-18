@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-/**
- * 업로드된 파일 메타데이터
- */
+
 @Entity
 @Table(name = "uploaded_file")
 @Getter

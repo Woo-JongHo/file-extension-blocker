@@ -31,11 +31,12 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
   
   // ══════════════════════════════════════
   // ========== 비즈니스 로직 ==========
-  // 1. GET /block-list - 모든 차단 확장자 조회
-  // 2. GET /fixed-block-list - 고정 확장자 조회
-  // 3. GET /custom-block-list - 커스텀 확장자 조회
+  // 1. GET /block-list - 활성화된 모든 차단 확장자 조회
+  // 2. GET /fixed-block-list - 고정 확장자 조회 (모두)
+  // 3. GET /custom-block-list - 커스텀 확장자 조회 (활성화)
   // 4. PATCH /fixed-change-status - 고정 확장자 상태 변경 (체크박스)
   // 5. GET /count-custom-block-list - 커스텀 확장자 개수
+  // 6. GET /count-active - 활성화된 전체 확장자 개수
   // ══════════════════════════════════════
   
   @GetMapping("/block-list")
@@ -68,6 +69,12 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
   public ResponseEntity<BaseResponse<Long>> countCustomBlockExtensions(@RequestParam Long spaceId) {
     Long count = blockedExtensionService.countCustomExtensions(spaceId);
     return successResponse(count, "커스텀 확장자 개수 조회 완료");
+  }
+
+  @GetMapping("/count-active")
+  public ResponseEntity<BaseResponse<Long>> countActiveExtensions(@RequestParam Long spaceId) {
+    Long count = blockedExtensionService.countActiveExtensions(spaceId);
+    return successResponse(count, "활성화된 확장자 개수 조회 완료");
   }
 }
 

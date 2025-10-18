@@ -5,9 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-/**
- * 파일 업로드 그룹 공간
- */
+
 @Entity
 @Table(name = "space")
 @Getter
