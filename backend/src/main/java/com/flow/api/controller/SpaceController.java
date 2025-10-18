@@ -1,8 +1,6 @@
 package com.flow.api.controller;
 
 import com.flow.api.domain.Space;
-import com.flow.api.domain.data.SpaceCreationRequest;
-import com.flow.api.domain.data.SpaceCreationResponse;
 import com.flow.api.domain.data.SpaceDto;
 import com.flow.api.service.SpaceService;
 import com.woo.core.controller.BaseController;
@@ -11,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -50,12 +50,17 @@ public class SpaceController extends BaseController<Space, SpaceDto> {
    * <ol>
    *   <li>Space 생성</li>
    *   <li>Admin Member 생성</li>
-   *   <li>고정 확장자 7개 자동 삽입 (활성화 상태)</li>
+   *   <li>고정 확장자 7개 자동 삽입 (비활성화 상태)</li>
    * </ol>
    */
   @PostMapping("/create-with-admin")
-  public ResponseEntity<BaseResponse<SpaceCreationResponse>> createSpaceWithAdmin(@RequestBody SpaceCreationRequest request) {
-    SpaceCreationResponse response = spaceService.createSpaceWithAdmin(request);
+  public ResponseEntity<BaseResponse<Map<String, Object>>> createSpaceWithAdmin(
+      @RequestParam String spaceName,
+      @RequestParam String description,
+      @RequestParam String adminUsername,
+      @RequestParam String adminPassword) {
+    Map<String, Object> response = spaceService.createSpaceWithAdmin(
+        spaceName, description, adminUsername, adminPassword);
     return successResponse(response, "Space 및 Admin Member 생성 완료");
   }
 

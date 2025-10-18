@@ -3,7 +3,8 @@ package com.flow.api.service.impl;
 import com.flow.api.domain.BlockedExtension;
 import com.flow.api.domain.Member;
 import com.flow.api.domain.Space;
-import com.flow.api.domain.data.*;
+import com.flow.api.domain.data.MemberDto;
+import com.flow.api.domain.data.SpaceDto;
 import com.flow.api.repository.BlockedExtensionRepository;
 import com.flow.api.repository.MemberRepository;
 import com.flow.api.repository.SpaceRepository;
@@ -13,8 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -80,28 +84,33 @@ public class SpaceServiceImpl extends BaseServiceImpl<Space> implements SpaceSer
   }
 
   @Override
-  public SpaceCreationResponse createSpaceWithAdmin(SpaceCreationRequest request) {
+  public Map<String, Object> createSpaceWithAdmin(
+      String spaceName, 
+      String description, 
+      String adminUsername, 
+      String adminPassword) {
+    
     // 1. 유효성 검증
-    if (existsBySpaceName(request.getSpaceName())) {
-      throw new IllegalArgumentException("이미 존재하는 Space 이름입니다: " + request.getSpaceName());
+    if (existsBySpaceName(spaceName)) {
+      throw new IllegalArgumentException("이미 존재하는 Space 이름입니다: " + spaceName);
     }
     
-    if (memberRepository.existsByUsernameAndIsDeletedFalse(request.getAdminUsername())) {
-      throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다: " + request.getAdminUsername());
+    if (memberRepository.existsByUsernameAndIsDeletedFalse(adminUsername)) {
+      throw new IllegalArgumentException("이미 존재하는 사용자 이름입니다: " + adminUsername);
     }
     
     // 2. Space 생성 (createdBy, updatedBy는 나중에 업데이트)
     Space createdSpace = Space.builder()
-        .spaceName(request.getSpaceName())
-        .description(request.getDescription())
+        .spaceName(spaceName)
+        .description(description)
         .isDeleted(false)
         .build();
     createdSpace = spaceRepository.save(createdSpace);
     
     // 3. Admin Member 생성
     Member createdAdmin = Member.builder()
-        .username(request.getAdminUsername())
-        .password(request.getAdminPassword())
+        .username(adminUsername)
+        .password(adminPassword)
         .spaceId(createdSpace.getSpaceId())
         .role(Member.MemberRole.ADMIN)
         .isDeleted(false)
@@ -128,11 +137,12 @@ public class SpaceServiceImpl extends BaseServiceImpl<Space> implements SpaceSer
     blockedExtensionRepository.saveAll(fixedExtensions);
     
     // 6. 응답 생성
-    return SpaceCreationResponse.builder()
-        .space(modelMapper.map(finalSpace, SpaceDto.class))
-        .adminMember(modelMapper.map(finalAdmin, MemberDto.class))
-        .fixedExtensionsCount(fixedExtensions.size())
-        .build();
+    Map<String, Object> response = new HashMap<>();
+    response.put("space", modelMapper.map(finalSpace, SpaceDto.class));
+    response.put("adminMember", modelMapper.map(finalAdmin, MemberDto.class));
+    response.put("fixedExtensionsCount", fixedExtensions.size());
+    
+    return response;
   }
 }
 
