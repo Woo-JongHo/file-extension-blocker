@@ -184,7 +184,8 @@ const SpaceListPage = () => {
                   <strong>방어 전략:</strong>
                   <span className="ml-2 text-blue-600">1단계 확장자 검증</span> →
                   <span className="ml-2 text-green-600">2단계 매직바이트 검증</span> →
-                  <span className="ml-2 text-orange-600">3단계 압축 파일 검증</span>
+                  <span className="ml-2 text-orange-600">3단계 압축 파일 검증</span> →
+                  <span className="ml-2 text-purple-600">4단계 권한 제거</span>
                 </p>
               </div>
             </div>
