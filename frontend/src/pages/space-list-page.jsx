@@ -6,8 +6,6 @@ import statsService from '@/services/stats-service';
 import SpaceCard from '@/components/space-card';
 import CreateSpaceModal from '@/components/create-space-modal';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://121.131.186.71:8800';
-
 const SpaceListPage = () => {
   const [spaces, setSpaces] = useState([]);
   const [spaceMembers, setSpaceMembers] = useState({});
@@ -191,12 +189,12 @@ const SpaceListPage = () => {
               <h4 className="font-semibold text-sm text-green-700 mb-3">정상 파일</h4>
               <div className="space-y-2">
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/1-normal/document.txt`}
+                  <a href="/test-files/1-normal/document.txt"
                      className="text-xs text-blue-600 hover:underline font-medium">document.txt</a>
                   <p className="text-xs text-gray-500 mt-0.5">통과 예상</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/1-normal/data.json`}
+                  <a href="/test-files/1-normal/data.json"
                      className="text-xs text-blue-600 hover:underline font-medium">data.json</a>
                   <p className="text-xs text-gray-500 mt-0.5">통과 예상</p>
                 </div>
@@ -208,17 +206,17 @@ const SpaceListPage = () => {
               <h4 className="font-semibold text-sm text-red-700 mb-3">차단 확장자</h4>
               <div className="space-y-2">
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/virus.bat`}
+                  <a href="/test-files/2-blocked-ext/virus.bat"
                      className="text-xs text-blue-600 hover:underline font-medium">virus.bat</a>
                   <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/script.sh`}
+                  <a href="/test-files/2-blocked-ext/script.sh"
                      className="text-xs text-blue-600 hover:underline font-medium">script.sh</a>
                   <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/hack.php`}
+                  <a href="/test-files/2-blocked-ext/hack.php"
                      className="text-xs text-blue-600 hover:underline font-medium">hack.php</a>
                   <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
                 </div>
@@ -230,12 +228,12 @@ const SpaceListPage = () => {
               <h4 className="font-semibold text-sm text-orange-700 mb-3">확장자 위장</h4>
               <div className="space-y-2">
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/3-disguised/fake-image.jpg`}
+                  <a href="/test-files/3-disguised/fake-image.jpg"
                      className="text-xs text-blue-600 hover:underline font-medium">fake-image.jpg</a>
                   <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - .sh 스크립트 위장 (MIME: application/x-sh)</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/3-disguised/fake-image-bat.jpg`}
+                  <a href="/test-files/3-disguised/fake-image-bat.jpg"
                      className="text-xs text-blue-600 hover:underline font-medium">fake-image-bat.jpg</a>
                   <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - .bat 스크립트 위장 (MIME: text/plain)</p>
                 </div>
@@ -247,22 +245,22 @@ const SpaceListPage = () => {
               <h4 className="font-semibold text-sm text-purple-700 mb-3">압축 파일</h4>
               <div className="space-y-2">
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/normal.zip`}
+                  <a href="/test-files/4-archive/normal.zip"
                      className="text-xs text-blue-600 hover:underline font-medium">normal.zip</a>
                   <p className="text-xs text-gray-500 mt-0.5">통과 예상 - 정상 압축 파일</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/malicious.zip`}
+                  <a href="/test-files/4-archive/malicious.zip"
                      className="text-xs text-blue-600 hover:underline font-medium">malicious.zip</a>
                   <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 내부 .bat 파일</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/zipbomb.zip`}
+                  <a href="/test-files/4-archive/zipbomb.zip"
                      className="text-xs text-blue-600 hover:underline font-medium">zipbomb.zip</a>
                   <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 10MB 초과</p>
                 </div>
                 <div>
-                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/nested.zip`}
+                  <a href="/test-files/4-archive/nested.zip"
                      className="text-xs text-blue-600 hover:underline font-medium">nested.zip</a>
                   <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 중첩 깊이 초과</p>
                 </div>
