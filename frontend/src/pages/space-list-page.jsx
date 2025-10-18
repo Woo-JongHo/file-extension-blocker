@@ -6,6 +6,8 @@ import statsService from '@/services/stats-service';
 import SpaceCard from '@/components/space-card';
 import CreateSpaceModal from '@/components/create-space-modal';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://121.131.186.71:8800';
+
 const SpaceListPage = () => {
   const [spaces, setSpaces] = useState([]);
   const [spaceMembers, setSpaceMembers] = useState({});
@@ -136,7 +138,7 @@ const SpaceListPage = () => {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              File Extension Blocker
+              파일 확장자 차단 기능 구현
             </h1>
             <p className="mt-2 text-gray-600">
               파일 확장자 차단 시스템 - Space 선택
@@ -167,23 +169,112 @@ const SpaceListPage = () => {
                   <strong>사용 방법:</strong> 아래 Space 카드에서 멤버 이름을 클릭하여 해당 권한으로 접속하세요.
                 </p>
                 <p>
-                  <strong>권한:</strong> 
+                  <strong>권한:</strong>
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
                     관리자
-                  </span> 확장자 관리 + 파일 업로드 | 
+                  </span> 확장자 관리 + 파일 업로드 |
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
                     멤버
                   </span> 파일 업로드만 가능
                 </p>
                 <p>
-                  <strong>방어 전략:</strong> 
-                  <span className="ml-2 text-blue-600">1단계 확장자 검증</span> → 
-                  <span className="ml-2 text-green-600">2단계 매직바이트 검증</span> → 
+                  <strong>방어 전략:</strong>
+                  <span className="ml-2 text-blue-600">1단계 확장자 검증</span> →
+                  <span className="ml-2 text-green-600">2단계 매직바이트 검증</span> →
                   <span className="ml-2 text-orange-600">3단계 압축 파일 검증</span>
                 </p>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 테스트 파일 다운로드 섹션 */}
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            테스트용 업로드 파일
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* 1-normal */}
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h4 className="font-semibold text-sm text-green-700 mb-3">정상 파일</h4>
+              <div className="space-y-2">
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/1-normal/document.txt`}
+                     className="text-xs text-blue-600 hover:underline font-medium">document.txt</a>
+                  <p className="text-xs text-gray-500 mt-0.5">통과 예상</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/1-normal/data.json`}
+                     className="text-xs text-blue-600 hover:underline font-medium">data.json</a>
+                  <p className="text-xs text-gray-500 mt-0.5">통과 예상</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 2-blocked-ext */}
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h4 className="font-semibold text-sm text-red-700 mb-3">차단 확장자</h4>
+              <div className="space-y-2">
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/virus.bat`}
+                     className="text-xs text-blue-600 hover:underline font-medium">virus.bat</a>
+                  <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/script.sh`}
+                     className="text-xs text-blue-600 hover:underline font-medium">script.sh</a>
+                  <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/2-blocked-ext/hack.php`}
+                     className="text-xs text-blue-600 hover:underline font-medium">hack.php</a>
+                  <p className="text-xs text-gray-500 mt-0.5">1단계 차단 - 확장자 검증</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 3-disguised */}
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h4 className="font-semibold text-sm text-orange-700 mb-3">확장자 위장</h4>
+              <div className="space-y-2">
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/3-disguised/fake-image.jpg`}
+                     className="text-xs text-blue-600 hover:underline font-medium">fake-image.jpg</a>
+                  <p className="text-xs text-gray-500 mt-0.5">2단계 차단 - MIME 타입 불일치</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 4-archive */}
+            <div className="bg-white rounded-lg p-4 border border-gray-200">
+              <h4 className="font-semibold text-sm text-purple-700 mb-3">압축 파일</h4>
+              <div className="space-y-2">
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/normal.zip`}
+                     className="text-xs text-blue-600 hover:underline font-medium">normal.zip</a>
+                  <p className="text-xs text-gray-500 mt-0.5">통과 예상 - 정상 압축 파일</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/malicious.zip`}
+                     className="text-xs text-blue-600 hover:underline font-medium">malicious.zip</a>
+                  <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 내부 .bat 파일</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/zipbomb.zip`}
+                     className="text-xs text-blue-600 hover:underline font-medium">zipbomb.zip</a>
+                  <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 10MB 초과</p>
+                </div>
+                <div>
+                  <a href={`${API_BASE_URL}/api/test-files/download/4-archive/nested.zip`}
+                     className="text-xs text-blue-600 hover:underline font-medium">nested.zip</a>
+                  <p className="text-xs text-gray-500 mt-0.5">3단계 차단 - 중첩 깊이 초과</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-600 mt-4">
+            이 파일들을 다운로드 받아 Space에 업로드하여 방어 전략을 테스트해보세요!
+          </p>
         </div>
 
         {/* Space 카드 그리드 (3×3) */}
