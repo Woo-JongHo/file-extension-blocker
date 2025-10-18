@@ -142,7 +142,8 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
     log.info("파일명: {}, 크기: {} bytes, spaceId: {}", 
         file.getOriginalFilename(), file.getSize(), spaceId);
     
-    String extension = validate2ndDefense(spaceId, file);
+    String extension = validate1stDefense(spaceId, file);
+    validate2ndDefense(spaceId, file, extension);
     validate3rdDefense(spaceId, file, extension);
     
     UploadedFile result = validate4thDefense(spaceId, file, extension);
@@ -212,14 +213,11 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    *
    * @param spaceId 공간 ID
    * @param file 업로드 파일
-   * @return 검증된 확장자
+   * @param extension 1단계에서 검증된 확장자
    * @throws IllegalArgumentException 실행 파일 감지 시
    * @throws RuntimeException Tika 분석 실패 시
    */
-  private String validate2ndDefense(Long spaceId, MultipartFile file) {
-    // 1단계: 기본 검증 + 확장자 Blacklist (재사용)
-    String extension = validate1stDefense(spaceId, file);
-
+  private void validate2ndDefense(Long spaceId, MultipartFile file, String extension) {
     log.info("===== [2단계] 매직바이트 & MIME 타입 검증 시작 =====");
     
     // 2단계: Apache Tika 매직 넘버 검증
@@ -239,7 +237,6 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
       validateDisguisedExtension(spaceId, extension, detectedMimeType, file.getOriginalFilename());
       
       log.info("[2단계] 전체 통과!");
-      return extension;
 
     } catch (IOException e) {
       log.error("[2단계] 오류 발생: {}", e.getMessage());
