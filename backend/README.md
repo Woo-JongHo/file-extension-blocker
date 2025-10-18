@@ -36,7 +36,15 @@
 │              Vercel (Frontend)                      │
 │   https://file-extension-blocker-three.vercel.app  │
 └─────────────────┬───────────────────────────────────┘
-                  │ HTTP Request
+                  │ HTTPS Request
+                  ↓
+┌─────────────────────────────────────────────────────┐
+│              ngrok (HTTPS Tunnel)                   │
+│   https://hilton-roseolar-pauselessly.ngrok-free.dev│
+│   - Mixed Content 해결 (HTTPS → HTTPS)              │
+│   - 인증 불필요 (ngrok-skip-browser-warning 헤더)   │
+└─────────────────┬───────────────────────────────────┘
+                  │ HTTP Request (내부)
                   ↓
 ┌─────────────────────────────────────────────────────┐
 │          개인 PC (Backend Server)                    │
@@ -46,6 +54,7 @@
 │  │  - Host: 0.0.0.0                          │    │
 │  │  - Port: 8800                             │    │
 │  │  - External IP: 121.131.197.71            │    │
+│  │  - Tunnel: ngrok (항상 실행 필요)          │    │
 │  └────────────┬───────────────────────────────┘    │
 │               │                                      │
 │               ↓                                      │
@@ -65,10 +74,12 @@
 
 ### 포트 매핑
 
-| 서비스 | 내부 포트 | 외부 포트 | 접속 URL |
-|--------|----------|----------|----------|
-| Spring Boot | 8800 | 8800 | http://121.131.197.71:8800 |
-| PostgreSQL | 5432 | 5445 | localhost:5445 |
+| 서비스 | 내부 포트 | 외부 접속 | 설명 |
+|--------|----------|----------|------|
+| Spring Boot | 8800 | https://hilton-roseolar-pauselessly.ngrok-free.dev | ngrok HTTPS 터널 (권장) |
+| Spring Boot | 8800 | http://121.131.197.71:8800 | 직접 접속 (포트 포워딩 필요) |
+| PostgreSQL | 5432 | localhost:5445 | 로컬 전용 |
+
 
 ---
 
