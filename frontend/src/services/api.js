@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://hilton-roseolar-pauselessly.ngrok-free.dev';
+// 로컬 개발 시 localhost, 배포 시 ngrok 사용
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
+  (isLocal ? 'http://localhost:8800' : 'https://hilton-roseolar-pauselessly.ngrok-free.dev');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

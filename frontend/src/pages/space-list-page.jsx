@@ -25,6 +25,16 @@ const SpaceListPage = () => {
       
       // Space 목록 조회
       const { data: spacesData, message } = await spaceService.getAllSpaces();
+      console.log('spacesData:', spacesData); // 디버깅용
+      
+      // spacesData가 배열인지 확인
+      if (!Array.isArray(spacesData)) {
+        console.error('spacesData is not an array:', spacesData);
+        setSpaces([]);
+        setError('Space 목록 형식이 잘못되었습니다.');
+        return;
+      }
+      
       setSpaces(spacesData);
 
       // 각 Space의 멤버 및 통계 조회
