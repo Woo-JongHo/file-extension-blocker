@@ -24,8 +24,11 @@ const SpaceListPage = () => {
       setLoading(true);
       
       // Space 목록 조회
-      const { data: spacesData, message } = await spaceService.getAllSpaces();
-      console.log('spacesData:', spacesData); // 디버깅용
+      const response = await spaceService.getAllSpaces();
+      console.log('Full response:', response); // 디버깅용
+      console.log('response.data:', response.data); // 디버깅용
+      
+      const spacesData = response.data;
       
       // spacesData가 배열인지 확인
       if (!Array.isArray(spacesData)) {
