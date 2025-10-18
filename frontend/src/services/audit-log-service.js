@@ -29,7 +29,7 @@ export const auditLogService = {
    * SSE 스트림 연결
    */
   connectToLogStream: () => {
-    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://orange-bottles-smoke.loca.lt';
+    const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hilton-roseolar-pauselessly.ngrok-free.dev';
     return new EventSource(`${baseURL}/api/logs/stream`);
   },
 

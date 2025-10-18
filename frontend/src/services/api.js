@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://orange-bottles-smoke.loca.lt';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://hilton-roseolar-pauselessly.ngrok-free.dev';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

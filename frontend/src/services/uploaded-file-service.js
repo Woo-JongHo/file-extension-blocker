@@ -45,7 +45,7 @@ const uploadedFileService = {
 
   // 파일 다운로드
   downloadFile: async (fileId, fileName) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'https://orange-bottles-smoke.loca.lt';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://hilton-roseolar-pauselessly.ngrok-free.dev';
     const response = await fetch(`${API_URL}/api/uploaded-files/download/${fileId}`, {
       method: 'GET'
     });
