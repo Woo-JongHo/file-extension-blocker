@@ -38,7 +38,7 @@ public class MemberController extends BaseController<Member, MemberDto> {
   public ResponseEntity<BaseResponse<List<MemberDto>>> getMembersBySpace(
       @RequestParam Long spaceId) {
     List<Member> members = memberService.getMembersBySpace(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(members), "멤버 목록 조회 완료"));
+    return successResponse(toDtoList(members), "멤버 목록 조회 완료");
   }
 }
 

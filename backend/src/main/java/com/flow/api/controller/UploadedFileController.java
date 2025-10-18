@@ -43,7 +43,7 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
       @RequestParam("file") MultipartFile file) {
     try {
       UploadedFile uploadedFile = uploadedFileService.uploadFile(spaceId, file);
-      return ResponseEntity.ok(BaseResponse.success(toDto(uploadedFile), "파일 업로드 완료"));
+      return successResponse(toDto(uploadedFile), "파일 업로드 완료");
 
     } catch (IllegalArgumentException e) {
       return ResponseEntity.badRequest().body(BaseResponse.error("FILE_UPLOAD_FAILED", e.getMessage()));
@@ -55,19 +55,19 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
       @RequestParam Long spaceId,
       @RequestParam String extension) {
     boolean isBlocked = uploadedFileService.isExtensionBlocked(spaceId, extension);
-    return ResponseEntity.ok(BaseResponse.success(isBlocked, "확장자 차단 여부 확인 완료"));
+    return successResponse(isBlocked, "확장자 차단 여부 확인 완료");
   }
 
   @GetMapping("/list")
   public ResponseEntity<BaseResponse<List<UploadedFileDto>>> getFiles(@RequestParam Long spaceId) {
     List<UploadedFile> files = uploadedFileService.getFilesBySpace(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(files), "파일 목록 조회 완료"));
+    return successResponse(toDtoList(files), "파일 목록 조회 완료");
   }
 
   @GetMapping("/count")
   public ResponseEntity<BaseResponse<Long>> countFiles(@RequestParam Long spaceId) {
     Long count = uploadedFileService.countFilesBySpace(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(count, "파일 개수 조회 완료"));
+    return successResponse(count, "파일 개수 조회 완료");
   }
 }
 

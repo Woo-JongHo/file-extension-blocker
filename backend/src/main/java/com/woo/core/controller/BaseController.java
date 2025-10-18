@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -54,50 +55,50 @@ public abstract class BaseController<E, D extends Identifiable> {
   protected final ModelMapper modelMapper;
 
   @PostMapping
-  public BaseResponse<D> create(@RequestBody D dto) {
+  public ResponseEntity<BaseResponse<D>> create(@RequestBody D dto) {
     E entity = toEntity(dto);
     E saved = service.create(entity);
     D savedDto = toDto(saved);
-    return BaseResponse.success(savedDto, "생성 완료");
+    return successResponse(savedDto, "생성 완료");
   }
 
   @PutMapping("/{id}")
-  public BaseResponse<D> update(@PathVariable Long id, @RequestBody D dto) {
+  public ResponseEntity<BaseResponse<D>> update(@PathVariable Long id, @RequestBody D dto) {
     E existing = service.findById(id);
     modelMapper.map(dto, existing);
     E updated = service.update(existing);
     D updatedDto = toDto(updated);
-    return BaseResponse.success(updatedDto, "수정 완료");
+    return successResponse(updatedDto, "수정 완료");
   }
 
   @DeleteMapping("/{id}")
-  public BaseResponse<Void> delete(@PathVariable Long id) {
+  public ResponseEntity<BaseResponse<Void>> delete(@PathVariable Long id) {
     service.delete(id);
-    return BaseResponse.success(null, "삭제 완료");
+    return successResponse(null, "삭제 완료");
   }
 
   @PatchMapping("/soft-delete/{id}")
-  public BaseResponse<Void> isDelete(@PathVariable Long id) {
+  public ResponseEntity<BaseResponse<Void>> isDelete(@PathVariable Long id) {
     E entity = service.findById(id);
     service.softDelete(entity);
-    return BaseResponse.success(null, "삭제 완료");
+    return successResponse(null, "삭제 완료");
   }
 
   @GetMapping("/{id}")
-  public BaseResponse<D> get(@PathVariable Long id) {
+  public ResponseEntity<BaseResponse<D>> get(@PathVariable Long id) {
     E entity = service.findById(id);
     if (entity == null) {
-      return BaseResponse.error("ENTITY_NOT_FOUND", "요청한 데이터를 찾을 수 없습니다.");
+      return ResponseEntity.badRequest().body(BaseResponse.error("ENTITY_NOT_FOUND", "요청한 데이터를 찾을 수 없습니다."));
     }
-    return BaseResponse.success(toDto(entity), "조회 완료");
+    return successResponse(toDto(entity), "조회 완료");
   }
 
   @GetMapping("/search")
-  public BaseResponse<Page<D>> search(
+  public ResponseEntity<BaseResponse<Page<D>>> search(
       @RequestParam Map<String, Object> filters, Pageable pageable) {
     Page<E> result = service.search(filters, pageable);
     Page<D> dtoResult = toDtoPage(result);
-    return BaseResponse.success(dtoResult, "검색 완료");
+    return successResponse(dtoResult, "검색 완료");
   }
 
   protected D toDto(E entity) {
@@ -118,6 +119,15 @@ public abstract class BaseController<E, D extends Identifiable> {
 
   protected Page<D> toDtoPage(Page<E> entityPage) {
     return entityPage.map(this::toDto);
+  }
+
+  // ResponseEntity 헬퍼 메서드
+  protected <T> ResponseEntity<BaseResponse<T>> successResponse(T data) {
+    return BaseResponse.successResponse(data);
+  }
+
+  protected <T> ResponseEntity<BaseResponse<T>> successResponse(T data, String message) {
+    return BaseResponse.successResponse(data, message);
   }
 
   protected abstract Class<D> getDtoClass();

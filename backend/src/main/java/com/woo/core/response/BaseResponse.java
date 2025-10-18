@@ -61,7 +61,6 @@ public class BaseResponse<T> {
     return BaseResponse.<T>builder()
         .timestamp(now())
         .status(200)
-        .message("요청이 성공적으로 처리되었습니다.")
         .data(data)
         .build();
   }
@@ -85,6 +84,16 @@ public class BaseResponse<T> {
         .build();
   }
 
+  public static <T> BaseResponse<T> error(String errorCode, String errorDetail, String message) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(400)
+        .message(message)
+        .errorCode(errorCode)
+        .errorDetail(errorDetail)
+        .build();
+  }
+
   public static <T> BaseResponse<T> error(int status, String errorCode, String errorDetail) {
     return BaseResponse.<T>builder()
         .timestamp(now())
@@ -95,9 +104,23 @@ public class BaseResponse<T> {
         .build();
   }
 
+  public static <T> BaseResponse<T> error(int status, String errorCode, String errorDetail, String message) {
+    return BaseResponse.<T>builder()
+        .timestamp(now())
+        .status(status)
+        .message(message)
+        .errorCode(errorCode)
+        .errorDetail(errorDetail)
+        .build();
+  }
+
   // ResponseEntity 반환 (하위 호환성)
   public static <T> ResponseEntity<BaseResponse<T>> successResponse(T data) {
     return ResponseEntity.ok(success(data));
+  }
+
+  public static <T> ResponseEntity<BaseResponse<T>> successResponse(T data, String message) {
+    return ResponseEntity.ok(success(data, message));
   }
 
   public static <T> ResponseEntity<BaseResponse<T>> errorResponse(

@@ -37,13 +37,13 @@ public class SpaceController extends BaseController<Space, SpaceDto> {
   @GetMapping("/space-list")
   public ResponseEntity<BaseResponse<List<SpaceDto>>> getAllSpaces() {
     List<Space> spaces = spaceService.getAllSpaces();
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(spaces), "Space 목록 조회 완료"));
+    return successResponse(toDtoList(spaces), "Space 목록 조회 완료");
   }
 
   @PostMapping("/{spaceId}/top6")
   public ResponseEntity<BaseResponse<Void>> insertTop6Extensions(@PathVariable Long spaceId, @RequestParam Long memberId) {
     spaceService.insertTop6Extensions(spaceId, memberId);
-    return ResponseEntity.ok(BaseResponse.success(null, "Top-6 고정 확장자 삽입 완료"));
+    return successResponse(null, "Top-6 고정 확장자 삽입 완료");
   }
 }
 

@@ -41,19 +41,19 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
   @GetMapping("/block-list")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getBlockExtensionsBySpace(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getBlockedExtensions(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(extensions), "차단 확장자 목록 조회 완료"));
+    return successResponse(toDtoList(extensions), "차단 확장자 목록 조회 완료");
   }
 
   @GetMapping("/fixed-block-list")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getFixedBlockExtensions(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getFixedExtensions(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(extensions), "고정 확장자 목록 조회 완료"));
+    return successResponse(toDtoList(extensions), "고정 확장자 목록 조회 완료");
   }
 
   @GetMapping("/custom-block-list")
   public ResponseEntity<BaseResponse<List<BlockedExtensionDto>>> getCustomBlockExtensions(@RequestParam Long spaceId) {
     List<BlockedExtension> extensions = blockedExtensionService.getCustomExtensions(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(toDtoList(extensions), "커스텀 확장자 목록 조회 완료"));
+    return successResponse(toDtoList(extensions), "커스텀 확장자 목록 조회 완료");
   }
 
   @PatchMapping("/fixed-change-status")
@@ -61,13 +61,13 @@ public class BlockedExtensionController extends BaseController<BlockedExtension,
       @RequestParam Long spaceId,
       @RequestParam String extension) {
     blockedExtensionService.toggleFixedExtension(spaceId, extension);
-    return ResponseEntity.ok(BaseResponse.success(null, "고정 확장자 상태 변경 완료"));
+    return successResponse(null, "고정 확장자 상태 변경 완료");
   }
 
   @GetMapping("/count-custom-block-list")
   public ResponseEntity<BaseResponse<Long>> countCustomBlockExtensions(@RequestParam Long spaceId) {
     Long count = blockedExtensionService.countCustomExtensions(spaceId);
-    return ResponseEntity.ok(BaseResponse.success(count, "커스텀 확장자 개수 조회 완료"));
+    return successResponse(count, "커스텀 확장자 개수 조회 완료");
   }
 }
 

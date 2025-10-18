@@ -7,7 +7,20 @@
       "Bash(docker compose:*)",
       "Read(//Users/woojongho/Desktop/Project/file-extension-blocker/**)",
       "Bash(docker exec backend-postgres-1 psql -U postgres -c \"\\l\")",
-      "Bash(docker exec backend-postgres-1 psql -U root -c \"\\du\")"
+      "Bash(docker exec backend-postgres-1 psql -U root -c \"\\du\")",
+      "Bash(dd if=/dev/zero of=huge.txt bs=1m count=15)",
+      "Bash(zip -9 zipbomb.zip huge.txt)",
+      "Bash(rm huge.txt)",
+      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/normal.zip .)",
+      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/malicious.zip .)",
+      "Bash(mv /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/zipbomb.zip .)",
+      "Bash(rm /Users/woojongho/Desktop/Project/file-extension-blocker/backend/src/main/resources/test-files/3-disguised/fake-script.sh)",
+      "Bash(rm -f README.md generate-test-files.ps1 3-disguised/README.md 4-archive/*.md)",
+      "Bash(find . -type f ( -name \"*.md\" -o -name \"*.ps1\" ))",
+      "Bash(git log --all --full-history --source --oneline -- src/main/java/com/woo/core/controller/BaseController.java)",
+      "Bash(diskutil list)",
+      "Bash(diskutil rename \"USB_2TB_우종호\" \"USB_WOO_2TB\")",
+      "Bash(diskutil rename disk6s1 \"USB_WOO_2TB\")"
     ],
     "deny": []
   }

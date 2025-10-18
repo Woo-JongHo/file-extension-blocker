@@ -54,17 +54,17 @@ public class TestFileController {
     ));
 
     fileMap.put("3-disguised", List.of(
-        "README.md (생성 가이드)"
+        "fake-image.jpg"
     ));
 
     fileMap.put("4-archive", List.of(
-        "normal.zip.md (생성 가이드)",
-        "malicious.zip.md (생성 가이드)",
-        "zipbomb.zip.md (생성 가이드)",
-        "nested.zip.md (생성 가이드)"
+        "normal.zip",
+        "malicious.zip",
+        "zipbomb.zip",
+        "nested.zip"
     ));
 
-    return ResponseEntity.ok(BaseResponse.success(fileMap, "테스트 파일 목록 조회 완료"));
+    return BaseResponse.successResponse(fileMap, "테스트 파일 목록 조회 완료");
   }
 
   /**
@@ -111,7 +111,7 @@ public class TestFileController {
     categories.put("3-disguised", "확장자 위장 (2단계 차단)");
     categories.put("4-archive", "압축 파일 (3단계 테스트)");
 
-    return ResponseEntity.ok(BaseResponse.success(categories, "카테고리 목록 조회 완료"));
+    return BaseResponse.successResponse(categories, "카테고리 목록 조회 완료");
   }
 }
 
