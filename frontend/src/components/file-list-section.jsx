@@ -35,6 +35,15 @@ const FileListSection = ({ spaceId, refreshKey }) => {
     }
   };
 
+  const handleDownload = async (fileId, fileName) => {
+    try {
+      await uploadedFileService.downloadFile(fileId, fileName);
+    } catch (err) {
+      console.error('파일 다운로드 실패:', err);
+      alert('파일 다운로드에 실패했습니다.');
+    }
+  };
+
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + ' KB';
@@ -100,12 +109,20 @@ const FileListSection = ({ spaceId, refreshKey }) => {
                       {formatDate(file.createdAt)}
                     </td>
                     <td className="px-4 py-3 text-sm">
-                      <button
-                        onClick={() => handleDelete(file.fileId)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        삭제
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleDownload(file.fileId, file.originalName)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          다운로드
+                        </button>
+                        <button
+                          onClick={() => handleDelete(file.fileId)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

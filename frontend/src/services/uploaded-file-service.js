@@ -42,6 +42,28 @@ const uploadedFileService = {
     });
     return baseResponse;
   },
+
+  // 파일 다운로드
+  downloadFile: async (fileId, fileName) => {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8800';
+    const response = await fetch(`${API_URL}/api/uploaded-files/download/${fileId}`, {
+      method: 'GET'
+    });
+    
+    if (!response.ok) {
+      throw new Error('파일 다운로드 실패');
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };
 
 export default uploadedFileService;

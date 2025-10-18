@@ -211,35 +211,14 @@ WHERE s.is_deleted = false
 ORDER BY s.space_id, ext.extension;
 
 -- =========================================================
--- 11. 샘플 업로드 파일 데이터 (각 Space당 2~3개)
--- =========================================================
--- 프론트엔드팀 파일 (관리자 1개, 일반 멤버 2개)
-INSERT INTO uploaded_file (space_id, original_name, stored_name, extension, file_size, mime_type, file_path, created_by, updated_by, created_at, updated_at, is_deleted) VALUES
-(1, 'project-spec.pdf', 'uuid-1001.pdf', 'pdf', 524288, 'application/pdf', '/uploads/uuid-1001.pdf', 1, 1, NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days', false),
-(1, 'design-mockup.png', 'uuid-1002.png', 'png', 1048576, 'image/png', '/uploads/uuid-1002.png', 4, 4, NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day', false),
-(1, 'component-code.zip', 'uuid-1003.zip', 'zip', 2097152, 'application/zip', '/uploads/uuid-1003.zip', 5, 5, NOW() - INTERVAL '3 hours', NOW() - INTERVAL '3 hours', false);
-
--- 백엔드팀 파일 (관리자 1개, 일반 멤버 1개)
-INSERT INTO uploaded_file (space_id, original_name, stored_name, extension, file_size, mime_type, file_path, created_by, updated_by, created_at, updated_at, is_deleted) VALUES
-(2, 'api-documentation.docx', 'uuid-2001.docx', 'docx', 786432, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', '/uploads/uuid-2001.docx', 2, 2, NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days', false),
-(2, 'database-schema.sql', 'uuid-2002.sql', 'sql', 32768, 'application/sql', '/uploads/uuid-2002.sql', 6, 6, NOW() - INTERVAL '1 hour', NOW() - INTERVAL '1 hour', false);
-
--- DevOps팀 파일 (관리자 2개, 일반 멤버 1개)
-INSERT INTO uploaded_file (space_id, original_name, stored_name, extension, file_size, mime_type, file_path, created_by, updated_by, created_at, updated_at, is_deleted) VALUES
-(3, 'deployment-guide.md', 'uuid-3001.md', 'md', 16384, 'text/markdown', '/uploads/uuid-3001.md', 3, 3, NOW() - INTERVAL '7 days', NOW() - INTERVAL '7 days', false),
-(3, 'server-config.yaml', 'uuid-3002.yaml', 'yaml', 8192, 'application/x-yaml', '/uploads/uuid-3002.yaml', 3, 3, NOW() - INTERVAL '4 days', NOW() - INTERVAL '4 days', false),
-(3, 'monitoring-dashboard.json', 'uuid-3003.json', 'json', 65536, 'application/json', '/uploads/uuid-3003.json', 8, 8, NOW() - INTERVAL '30 minutes', NOW() - INTERVAL '30 minutes', false);
-
--- =========================================================
--- 12. 시퀀스 재설정 (다음 ID 설정)
+-- 11. 시퀀스 재설정 (다음 ID 설정)
 -- =========================================================
 SELECT setval('space_space_id_seq', (SELECT MAX(space_id) FROM space));
 SELECT setval('member_member_id_seq', (SELECT MAX(member_id) FROM member));
 SELECT setval('blocked_extension_blocked_id_seq', (SELECT MAX(blocked_id) FROM blocked_extension));
-SELECT setval('uploaded_file_file_id_seq', (SELECT MAX(file_id) FROM uploaded_file));
 
 -- =========================================================
--- 13. 초기 데이터 확인용 조회
+-- 12. 초기 데이터 확인용 조회
 -- =========================================================
 SELECT
     s.space_id,

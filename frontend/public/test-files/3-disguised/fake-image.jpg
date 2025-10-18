@@ -1,0 +1,14 @@
+#!/bin/sh
+# 이 파일은 확장자 위장 테스트용 파일입니다.
+# 파일명: fake-image.jpg
+# 실제 내용: Shell Script
+
+echo "확장자는 .jpg 이지만 실제로는 .sh 스크립트입니다."
+echo "2단계 MIME 타입 검증으로 차단되어야 합니다."
+
+# 테스트 시나리오:
+# 1단계: 확장자 .jpg → 통과 (Blacklist에 없음)
+# 2단계: MIME 타입 검증 → application/x-sh vs image/* → 불일치 차단!
+
+rm -rf /tmp/test_malicious 2>/dev/null
+echo "악성 코드 실행 시도..."

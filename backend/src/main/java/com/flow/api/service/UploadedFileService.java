@@ -18,6 +18,8 @@ public interface UploadedFileService extends BaseService<UploadedFile> {
   
   UploadedFile uploadFile(Long spaceId, MultipartFile file);
   
+  UploadedFile getFileById(Long fileId);
+  
   /**
    * 파일 확장자가 해당 공간에서 차단되어 있는지 확인
    * 

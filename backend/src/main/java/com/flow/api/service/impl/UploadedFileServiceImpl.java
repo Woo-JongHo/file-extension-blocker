@@ -104,6 +104,13 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
 
   @Override
   @Transactional(readOnly = true)
+  public UploadedFile getFileById(Long fileId) {
+    return uploadedFileRepository.findById(fileId)
+        .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다: " + fileId));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public Long countFilesBySpace(Long spaceId) {
     return uploadedFileRepository.countBySpaceIdAndIsDeletedFalse(spaceId);
   }
