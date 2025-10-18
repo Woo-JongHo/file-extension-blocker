@@ -45,7 +45,7 @@ const uploadedFileService = {
 
   // 파일 다운로드
   downloadFile: async (fileId, fileName) => {
-    const API_URL = import.meta.env.VITE_API_URL || 'http://121.131.197.71:8800';
+    const API_URL = import.meta.env.VITE_API_URL || 'https://orange-bottles-smoke.loca.lt';
     const response = await fetch(`${API_URL}/api/uploaded-files/download/${fileId}`, {
       method: 'GET'
     });

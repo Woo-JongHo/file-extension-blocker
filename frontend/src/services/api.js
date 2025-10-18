@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://121.131.197.71:8800';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://orange-bottles-smoke.loca.lt';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
