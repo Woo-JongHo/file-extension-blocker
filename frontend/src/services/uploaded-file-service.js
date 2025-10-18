@@ -49,7 +49,10 @@ const uploadedFileService = {
     const API_URL = import.meta.env.VITE_API_URL || 
       (isLocal ? 'http://localhost:8800' : 'https://hilton-roseolar-pauselessly.ngrok-free.dev');
     const response = await fetch(`${API_URL}/api/uploaded-files/download/${fileId}`, {
-      method: 'GET'
+      method: 'GET',
+      headers: {
+        'ngrok-skip-browser-warning': 'true'  // ngrok 경고 페이지 우회
+      }
     });
     
     if (!response.ok) {
