@@ -1,10 +1,10 @@
-# 📋 File Extension Blocker
+# File Extension Blocker
 
 파일 확장자 차단 시스템
 
 ---
 
-## 👨‍💻 과제 정보
+## 과제 정보
 
 **작성자**: 우종호
 
@@ -13,7 +13,7 @@
 
 ---
 
-## 📢 과제 공지
+## 과제 공지
 
 ### 제출 과제
 1. **"파일 확장자 차단" 과제 제출**
@@ -25,7 +25,7 @@
 
 ---
 
-## 📖 과제 설명
+## 과제 설명
 
 어떤 파일들은 첨부 시 보안에 문제가 될 수 있습니다. 특히 `exe`, `sh` 등의 실행파일이 존재할 경우 서버에 올려서 실행될 수 있는 위험이 있어 파일 확장자를 차단하게 되었습니다.
 
@@ -50,14 +50,14 @@
 
 ---
 
-## 📚 문서
+## 문서
 
 - **과제에 대한 전략**: [strategy.md](docs/strategy.md)에서 확인할 수 있습니다.
 - **데이터베이스 설계 전략 및 스키마**: [sql.md](docs/sql.md)에서 확인할 수 있습니다.
 
 ---
 
-## 🚀 시작하기
+## 시작하기
 
 ### 필수 요구사항
 - Java 17+
@@ -85,20 +85,55 @@ docker compose up -d
 
 애플리케이션이 `http://localhost:8800`에서 실행됩니다.
 
-## 📡 서비스 포트
+## 서비스 포트
 
 - **Backend API**: `http://localhost:8800`
 - **PostgreSQL**: `localhost:5445`
 
-## 🗄️ 데이터베이스 접속 정보
+## 데이터베이스 접속 정보
 
 - Host: `localhost`
 - Port: `5445`
-- Database: `flow-assignment-fileblocker`
-- Username: `flow-user`
-- Password: `flow12!@`
+- Database: `file_extension_blocker`
+- Username: `postgres`
+- Password: `postgres`
 
-## 🔧 유용한 명령어
+### 초기 데이터 (init.sql)
+
+Docker Compose 실행 시 `backend/docker/init.sql`이 자동으로 실행되어 다음 데이터가 생성됩니다:
+
+#### 1. Space (3개)
+- 프론트엔드팀
+- 백엔드팀
+- DevOps팀
+
+#### 2. Member (9명)
+각 Space마다:
+- 관리자 1명 (ADMIN) - 확장자 관리 + 파일 업로드 권한
+- 일반 멤버 2명 (MEMBER) - 파일 업로드만 가능
+
+**관리자 계정 정보:**
+- 프론트엔드팀: `frontend_admin` / `1234`
+- 백엔드팀: `backend_admin` / `1234`
+- DevOps팀: `devops_admin` / `1234`
+
+**일반 멤버 계정 정보:**
+- 각 팀별: `{팀명}_user1`, `{팀명}_user2` / `1234`
+
+#### 3. 고정 확장자 (각 Space당 7개)
+- `bat`, `cmd`, `com`, `cpl`, `exe`, `js`, `scr`
+- **기본 상태**: 비활성화 (isDeleted = true)
+- 관리자가 필요한 확장자만 체크박스로 활성화
+
+#### 4. 초기화 방법
+데이터베이스를 초기 상태로 되돌리려면:
+```bash
+cd backend
+docker compose down -v  # 볼륨 삭제
+docker compose up -d    # 재시작 (init.sql 자동 실행)
+```
+
+## 유용한 명령어
 
 ### Docker
 ```bash
