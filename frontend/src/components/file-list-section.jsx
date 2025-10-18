@@ -69,6 +69,9 @@ const FileListSection = ({ spaceId, refreshKey }) => {
                     크기
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    업로더
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     업로드 일시
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -87,6 +90,11 @@ const FileListSection = ({ spaceId, refreshKey }) => {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {formatFileSize(file.fileSize)}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {file.uploaderName || '알 수 없음'}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {formatDate(file.createdAt)}

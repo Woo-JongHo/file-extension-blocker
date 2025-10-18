@@ -60,8 +60,8 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
 
   @GetMapping("/list")
   public ResponseEntity<BaseResponse<List<UploadedFileDto>>> getFiles(@RequestParam Long spaceId) {
-    List<UploadedFile> files = uploadedFileService.getFilesBySpace(spaceId);
-    return successResponse(toDtoList(files), "파일 목록 조회 완료");
+    List<UploadedFileDto> files = uploadedFileService.getFilesBySpaceWithUploader(spaceId);
+    return successResponse(files, "파일 목록 조회 완료");
   }
 
   @GetMapping("/count")

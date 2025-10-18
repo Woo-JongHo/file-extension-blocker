@@ -1,7 +1,10 @@
 package com.flow.api.service.impl;
 
 import com.flow.api.domain.BlockedExtension;
+import com.flow.api.domain.Member;
 import com.flow.api.domain.UploadedFile;
+import com.flow.api.domain.data.UploadedFileDto;
+import com.flow.api.repository.MemberRepository;
 import com.flow.api.repository.UploadedFileRepository;
 import com.flow.api.service.BlockedExtensionService;
 import com.flow.api.service.UploadedFileService;
@@ -33,6 +36,7 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
 
   private final UploadedFileRepository uploadedFileRepository;
   private final BlockedExtensionService blockedExtensionService;
+  private final MemberRepository memberRepository;
   private final Tika tika;
 
   //10MB TJFWJD
@@ -45,10 +49,12 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
 
   public UploadedFileServiceImpl(
       UploadedFileRepository uploadedFileRepository,
-      BlockedExtensionService blockedExtensionService) {
+      BlockedExtensionService blockedExtensionService,
+      MemberRepository memberRepository) {
     super(uploadedFileRepository);
     this.uploadedFileRepository = uploadedFileRepository;
     this.blockedExtensionService = blockedExtensionService;
+    this.memberRepository = memberRepository;
     this.tika = new Tika();
   }
 
@@ -56,6 +62,38 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
   @Transactional(readOnly = true)
   public List<UploadedFile> getFilesBySpace(Long spaceId) {
     return uploadedFileRepository.findBySpaceIdAndIsDeletedFalse(spaceId);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public List<UploadedFileDto> getFilesBySpaceWithUploader(Long spaceId) {
+    List<UploadedFile> files = uploadedFileRepository.findBySpaceIdAndIsDeletedFalse(spaceId);
+    
+    return files.stream()
+        .map(file -> {
+          String uploaderName = "알 수 없음";
+          
+          if (file.getCreatedBy() != null) {
+            Member member = memberRepository.findById(file.getCreatedBy()).orElse(null);
+            if (member != null) {
+              uploaderName = member.getUsername();
+            }
+          }
+          
+          return UploadedFileDto.builder()
+              .fileId(file.getFileId())
+              .spaceId(file.getSpaceId())
+              .originalName(file.getOriginalName())
+              .storedName(file.getStoredName())
+              .extension(file.getExtension())
+              .fileSize(file.getFileSize())
+              .mimeType(file.getMimeType())
+              .filePath(file.getFilePath())
+              .createdAt(file.getCreatedAt())
+              .uploaderName(uploaderName)
+              .build();
+        })
+        .collect(Collectors.toList());
   }
 
   @Override

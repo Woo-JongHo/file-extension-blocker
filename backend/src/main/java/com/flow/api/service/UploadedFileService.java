@@ -1,6 +1,7 @@
 package com.flow.api.service;
 
 import com.flow.api.domain.UploadedFile;
+import com.flow.api.domain.data.UploadedFileDto;
 import com.woo.core.service.BaseService;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UploadedFileService extends BaseService<UploadedFile> {
   
   List<UploadedFile> getFilesBySpace(Long spaceId);
+  
+  List<UploadedFileDto> getFilesBySpaceWithUploader(Long spaceId);
   
   List<UploadedFile> getFilesByUploader(Long memberId);
   
