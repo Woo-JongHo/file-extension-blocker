@@ -7,6 +7,7 @@ import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -37,36 +38,36 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
   // ══════════════════════════════════════
   
   @PostMapping("/upload")
-  public BaseResponse<UploadedFileDto> uploadFile(
+  public ResponseEntity<BaseResponse<UploadedFileDto>> uploadFile(
       @RequestParam Long spaceId,
       @RequestParam("file") MultipartFile file) {
     try {
       UploadedFile uploadedFile = uploadedFileService.uploadFile(spaceId, file);
-      return BaseResponse.success(toDto(uploadedFile), "파일 업로드 완료");
-      
+      return ResponseEntity.ok(BaseResponse.success(toDto(uploadedFile), "파일 업로드 완료"));
+
     } catch (IllegalArgumentException e) {
-      return BaseResponse.error("FILE_UPLOAD_FAILED", e.getMessage());
+      return ResponseEntity.badRequest().body(BaseResponse.error("FILE_UPLOAD_FAILED", e.getMessage()));
     }
   }
-  
+
   @GetMapping("/check-extension")
-  public BaseResponse<Boolean> checkExtension(
+  public ResponseEntity<BaseResponse<Boolean>> checkExtension(
       @RequestParam Long spaceId,
       @RequestParam String extension) {
     boolean isBlocked = uploadedFileService.isExtensionBlocked(spaceId, extension);
-    return BaseResponse.success(isBlocked, "확장자 차단 여부 확인 완료");
+    return ResponseEntity.ok(BaseResponse.success(isBlocked, "확장자 차단 여부 확인 완료"));
   }
 
   @GetMapping("/list")
-  public BaseResponse<List<UploadedFileDto>> getFiles(@RequestParam Long spaceId) {
+  public ResponseEntity<BaseResponse<List<UploadedFileDto>>> getFiles(@RequestParam Long spaceId) {
     List<UploadedFile> files = uploadedFileService.getFilesBySpace(spaceId);
-    return BaseResponse.success(toDtoList(files), "파일 목록 조회 완료");
+    return ResponseEntity.ok(BaseResponse.success(toDtoList(files), "파일 목록 조회 완료"));
   }
 
   @GetMapping("/count")
-  public BaseResponse<Long> countFiles(@RequestParam Long spaceId) {
+  public ResponseEntity<BaseResponse<Long>> countFiles(@RequestParam Long spaceId) {
     Long count = uploadedFileService.countFilesBySpace(spaceId);
-    return BaseResponse.success(count, "파일 개수 조회 완료");
+    return ResponseEntity.ok(BaseResponse.success(count, "파일 개수 조회 완료"));
   }
 }
 

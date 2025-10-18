@@ -38,38 +38,33 @@ public class TestFileController {
 
   private static final String TEST_FILES_BASE = "test-files/";
 
-  /**
-   * 테스트 파일 목록 조회
-   *
-   * @return 카테고리별 파일 목록
-   */
   @GetMapping("/list")
-  public BaseResponse<Map<String, List<String>>> getTestFileList() {
+  public ResponseEntity<BaseResponse<Map<String, List<String>>>> getTestFileList() {
     Map<String, List<String>> fileMap = new HashMap<>();
-    
+
     fileMap.put("1-normal", List.of(
         "document.txt",
         "data.json"
     ));
-    
+
     fileMap.put("2-blocked-ext", List.of(
         "virus.bat",
         "script.sh",
         "hack.php"
     ));
-    
+
     fileMap.put("3-disguised", List.of(
         "README.md (생성 가이드)"
     ));
-    
+
     fileMap.put("4-archive", List.of(
         "normal.zip.md (생성 가이드)",
         "malicious.zip.md (생성 가이드)",
         "zipbomb.zip.md (생성 가이드)",
         "nested.zip.md (생성 가이드)"
     ));
-    
-    return BaseResponse.success(fileMap, "테스트 파일 목록 조회 완료");
+
+    return ResponseEntity.ok(BaseResponse.success(fileMap, "테스트 파일 목록 조회 완료"));
   }
 
   /**
@@ -109,14 +104,14 @@ public class TestFileController {
    * @return 카테고리 설명
    */
   @GetMapping("/categories")
-  public BaseResponse<Map<String, String>> getCategories() {
+  public ResponseEntity<BaseResponse<Map<String, String>>> getCategories() {
     Map<String, String> categories = new HashMap<>();
     categories.put("1-normal", "정상 파일 (모든 단계 통과)");
     categories.put("2-blocked-ext", "차단된 확장자 (1단계 차단)");
     categories.put("3-disguised", "확장자 위장 (2단계 차단)");
     categories.put("4-archive", "압축 파일 (3단계 테스트)");
-    
-    return BaseResponse.success(categories, "카테고리 목록 조회 완료");
+
+    return ResponseEntity.ok(BaseResponse.success(categories, "카테고리 목록 조회 완료"));
   }
 }
 

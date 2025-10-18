@@ -4,7 +4,10 @@
       "Bash(git rm:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Read(//Users/woojongho/Desktop/Project/file-extension-blocker/**)",
+      "Bash(docker exec backend-postgres-1 psql -U postgres -c \"\\l\")",
+      "Bash(docker exec backend-postgres-1 psql -U root -c \"\\du\")"
     ],
     "deny": []
   }
