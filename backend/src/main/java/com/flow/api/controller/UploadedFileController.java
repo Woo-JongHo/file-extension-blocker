@@ -5,7 +5,6 @@ import com.flow.api.domain.data.UploadedFileDto;
 import com.flow.api.service.UploadedFileService;
 import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,7 +19,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/uploaded-files")
 public class UploadedFileController extends BaseController<UploadedFile, UploadedFileDto> {
@@ -87,48 +85,30 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
    */
   @GetMapping("/download/{fileId}")
   public ResponseEntity<Resource> downloadFile(@PathVariable Long fileId) {
-    log.info("========== 업로드 파일 다운로드 시작 ==========");
-    log.info("요청 정보 - FileId: {}", fileId);
     
     try {
-      log.info("[1단계] DB에서 파일 정보 조회 시작");
       UploadedFile file = uploadedFileService.getFileById(fileId);
-      log.info("[1단계] 파일 정보 조회 완료 - 파일명: {}, 경로: {}", file.getOriginalName(), file.getFilePath());
       
       if (file.getIsDeleted()) {
-        log.warn("[실패] 삭제된 파일입니다 - FileId: {}", fileId);
         return ResponseEntity.notFound().build();
       }
-      log.info("[2단계] 삭제 여부 확인 완료 - 활성 파일");
       
       Path filePath = Paths.get(file.getFilePath()).normalize();
-      log.info("[3단계] 파일 경로 정규화 완료: {}", filePath.toAbsolutePath());
       
       Resource resource = new UrlResource(filePath.toUri());
-      log.info("[4단계] UrlResource 생성 완료");
       
       if (!resource.exists()) {
-        log.error("[실패] 실제 파일이 존재하지 않음: {}", filePath.toAbsolutePath());
         return ResponseEntity.notFound().build();
       }
-      log.info("[5단계] 파일 존재 확인 완료");
       
       if (!resource.isReadable()) {
-        log.error("[실패] 파일 읽기 권한 없음: {}", filePath.toAbsolutePath());
         return ResponseEntity.notFound().build();
       }
-      log.info("[6단계] 파일 읽기 권한 확인 완료");
       
       String contentType = file.getMimeType();
       if (contentType == null) {
         contentType = "application/octet-stream";
-        log.info("[7단계] MIME 타입 기본값 사용: {}", contentType);
-      } else {
-        log.info("[7단계] MIME 타입 확인: {}", contentType);
       }
-      
-      log.info("[8단계] 다운로드 응답 생성 - 파일명: {}", file.getOriginalName());
-      log.info("========== 업로드 파일 다운로드 성공 ==========");
       
       return ResponseEntity.ok()
           .contentType(MediaType.parseMediaType(contentType))
@@ -137,12 +117,8 @@ public class UploadedFileController extends BaseController<UploadedFile, Uploade
           .body(resource);
           
     } catch (MalformedURLException e) {
-      log.error("========== 업로드 파일 다운로드 실패 (잘못된 URL) ==========");
-      log.error("에러 메시지: {}", e.getMessage(), e);
       return ResponseEntity.internalServerError().build();
     } catch (Exception e) {
-      log.error("========== 업로드 파일 다운로드 실패 ==========");
-      log.error("에러 메시지: {}", e.getMessage(), e);
       return ResponseEntity.notFound().build();
     }
   }

@@ -7,14 +7,12 @@ import com.flow.api.domain.data.SpaceDto;
 import com.flow.api.service.SpaceService;
 import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/spaces")
 public class SpaceController extends BaseController<Space, SpaceDto> {

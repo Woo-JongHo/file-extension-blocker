@@ -1,7 +1,6 @@
 package com.flow.api.controller;
 
 import com.woo.core.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
  *
  * <p>application.log 파일 조회 및 실시간 스트리밍(SSE) 기능 제공
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/logs")
 public class LogStreamController {
@@ -77,7 +75,6 @@ public class LogStreamController {
           String.format("로그 조회 완료 (총 %d줄 중 최근 %d줄)", totalLines, Math.min(lines, totalLines)));
 
     } catch (IOException e) {
-      log.error("로그 파일 읽기 실패", e);
       return BaseResponse.errorResponse("로그 파일 읽기 실패: " + e.getMessage(), "LOG_READ_FAILED");
     }
   }

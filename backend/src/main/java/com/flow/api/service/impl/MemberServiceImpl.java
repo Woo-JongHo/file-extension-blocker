@@ -4,12 +4,10 @@ import com.flow.api.domain.Member;
 import com.flow.api.repository.MemberRepository;
 import com.flow.api.service.MemberService;
 import com.woo.core.service.BaseServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-@Slf4j
 @Service
 @Transactional
 public class MemberServiceImpl extends BaseServiceImpl<Member> implements MemberService {

@@ -4,13 +4,11 @@ import com.flow.api.domain.BlockedExtension;
 import com.flow.api.repository.BlockedExtensionRepository;
 import com.flow.api.service.BlockedExtensionService;
 import com.woo.core.service.BaseServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Slf4j
 @Service
 @Transactional
 public class BlockedExtensionServiceImpl extends BaseServiceImpl<BlockedExtension> implements BlockedExtensionService {
@@ -43,7 +41,6 @@ public class BlockedExtensionServiceImpl extends BaseServiceImpl<BlockedExtensio
             // 커스텀 확장자와 중복
             if (existing.getIsDeleted()) {
               // 삭제된 커스텀 확장자 → isDeleted를 false로 UPDATE (재활성화)
-              log.info("삭제된 커스텀 확장자 재활성화: {}", normalizedExtension);
               existing.setIsDeleted(false);
               existing.setUpdatedBy(entity.getCreatedBy()); // 수정자 업데이트
               return blockedExtensionRepository.save(existing);
@@ -56,7 +53,6 @@ public class BlockedExtensionServiceImpl extends BaseServiceImpl<BlockedExtensio
         })
         .orElseGet(() -> {
           // 존재하지 않음 → 새로 CREATE
-          log.info("새 커스텀 확장자 추가: {}", normalizedExtension);
           return super.create(entity);
         });
   }

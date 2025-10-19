@@ -10,7 +10,6 @@ import com.flow.api.service.BlockedExtensionService;
 import com.flow.api.service.UploadedFileService;
 import com.flow.util.fileDefence.ZipValidator;
 import com.woo.core.service.BaseServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @Transactional
 public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> implements UploadedFileService {
@@ -138,17 +136,12 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    */
   @Override
   public UploadedFile uploadFile(Long spaceId, MultipartFile file) {
-    log.info("========== 파일 업로드 시작 ==========");
-    log.info("파일명: {}, 크기: {} bytes, spaceId: {}", 
-        file.getOriginalFilename(), file.getSize(), spaceId);
-    
     String extension = validate1stDefense(spaceId, file);
     validate2ndDefense(spaceId, file, extension);
     validate3rdDefense(spaceId, file, extension);
     
     UploadedFile result = validate4thDefense(spaceId, file, extension);
     
-    log.info("========== 파일 업로드 성공 ==========");
     return result;
   }
 
@@ -218,28 +211,19 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    * @throws RuntimeException Tika 분석 실패 시
    */
   private void validate2ndDefense(Long spaceId, MultipartFile file, String extension) {
-    log.info("===== [2단계] 매직바이트 & MIME 타입 검증 시작 =====");
-    
-    // 2단계: Apache Tika 매직 넘버 검증
     try (InputStream inputStream = file.getInputStream()) {
       String detectedMimeType = tika.detect(inputStream, file.getOriginalFilename());
-      log.info("[2단계] 감지된 MIME 타입: {}", detectedMimeType);
 
       // 2-1. 실행 파일 감지 (바이너리 실행 파일 차단)
       if (isExecutableFile(detectedMimeType)) {
-        log.warn("[2단계] 차단! - 실행 파일 감지: {}", detectedMimeType);
         throw new IllegalArgumentException(
             String.format("실행 파일은 업로드할 수 없습니다. 감지된 타입: %s", detectedMimeType));
       }
-      log.info("[2단계] 통과! - 실행 파일 아님");
 
       // 2-2. 확장자 위장 검증 (감지된 MIME 타입이 차단 대상인지 확인)
       validateDisguisedExtension(spaceId, extension, detectedMimeType, file.getOriginalFilename());
-      
-      log.info("[2단계] 전체 통과!");
 
     } catch (IOException e) {
-      log.error("[2단계] 오류 발생: {}", e.getMessage());
       throw new RuntimeException("파일 형식 검증 중 오류가 발생했습니다.", e);
     }
   }
@@ -268,8 +252,6 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    * @throws IllegalArgumentException 차단된 확장자인 경우
    */
   private String validate1stDefense(Long spaceId, MultipartFile file) {
-    log.info("===== [1단계] 확장자 Blacklist 검증 시작 =====");
-    
     // 파일 기본 검증
     if (file == null || file.isEmpty()) {
       throw new IllegalArgumentException("파일이 비어있습니다.");
@@ -283,23 +265,18 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
     // 확장자 추출
     int lastDotIndex = originalFilename.lastIndexOf('.');
     String extension = (lastDotIndex == -1) ? "" : originalFilename.substring(lastDotIndex + 1).toLowerCase();
-    log.info("[1단계] 추출된 확장자: {}", extension);
     
     // 확장자 Blacklist 검증
     if (isExtensionBlocked(spaceId, extension)) {
-      log.warn("[1단계] 차단! - 확장자 '{}' 는 Blacklist에 포함됨", extension);
       throw new IllegalArgumentException(
           String.format("'%s' 확장자는 차단되어 업로드할 수 없습니다.", extension));
     }
-    log.info("[1단계] 통과! - 확장자 '{}' 는 Blacklist에 없음", extension);
     
     // 파일 크기 검증
     if (file.getSize() > maxFileSize) {
-      log.warn("[1단계] 차단! - 파일 크기 초과: {} bytes (최대: {})", file.getSize(), maxFileSize);
       throw new IllegalArgumentException(
           String.format("파일 크기가 너무 큽니다. 최대 크기: %dMB", maxFileSize / (1024 * 1024)));
     }
-    log.info("[1단계] 통과! - 파일 크기: {} bytes", file.getSize());
     
     return extension;
   }
@@ -369,18 +346,11 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
   private void validateDisguisedExtension(Long spaceId, String declaredExtension, 
                                           String detectedMimeType, String filename) {
     if (detectedMimeType == null) {
-      log.debug("[2-2단계] MIME 타입이 null, 검증 스킵");
       return;
     }
     
-    log.info("[2-2단계] 확장자 위장 검증 시작 - 감지된 MIME: {}", detectedMimeType);
-    
     // 해당 Space의 차단 확장자 목록 조회 (isDeleted = false만)
     List<BlockedExtension> blockedExtensions = blockedExtensionService.getBlockedExtensions(spaceId);
-    
-    log.info("[2-2단계] 해당 Space의 활성화된 차단 확장자: {} (총 {}개)", 
-        blockedExtensions.stream().map(BlockedExtension::getExtension).collect(Collectors.toList()),
-        blockedExtensions.size());
     
     // 각 차단 확장자의 예상 MIME 타입과 비교
     for (BlockedExtension blocked : blockedExtensions) {
@@ -390,23 +360,13 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
       String dummyFileName = "file." + blockedExt;
       String expectedMimeForBlockedExt = tika.detect(dummyFileName);
       
-      log.debug("[2-2단계]   차단 확장자 '{}' 의 예상 MIME: {}", blockedExt, expectedMimeForBlockedExt);
-      
       // 감지된 MIME 타입이 차단 확장자의 MIME 타입과 일치하는지 확인
       if (isMimeTypeMatch(detectedMimeType, expectedMimeForBlockedExt)) {
-        log.warn("[2-2단계] 차단! - 확장자 위장 감지");
-        log.warn("  파일명: {}", filename);
-        log.warn("  선언된 확장자: .{}", declaredExtension);
-        log.warn("  감지된 MIME: {}", detectedMimeType);
-        log.warn("  실제 파일 타입: .{} (차단 대상)", blockedExt);
-        
         throw new IllegalArgumentException(
             String.format("확장자 위장 파일이 감지되었습니다. (파일명: .%s, 실제: .%s - 차단 대상)", 
                 declaredExtension, blockedExt));
       }
     }
-    
-    log.info("[2-2단계] 통과! - 감지된 MIME이 차단 확장자 목록과 일치하지 않음");
   }
   
   /**
@@ -473,29 +433,19 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    * @throws IllegalArgumentException 압축 파일 검증 실패 시
    */
   private void validate3rdDefense(Long spaceId, MultipartFile file, String extension) {
-    log.info("===== [3단계] 압축 파일 내부 검증 시작 =====");
-    
     // 압축 파일 확장자 확인
     Set<String> archiveExtensions = Set.of("zip", "tar", "gz", "tgz", "7z");
     
     if (archiveExtensions.contains(extension.toLowerCase())) {
-      log.info("[3단계] 압축 파일 감지: {}", extension);
-      
       // 차단된 확장자 목록 조회
       List<BlockedExtension> blockedExtensions = blockedExtensionService.getBlockedExtensions(spaceId);
       Set<String> blockedSet = blockedExtensions.stream()
           .map(be -> be.getExtension().toLowerCase())
           .collect(Collectors.toSet());
       
-      log.info("[3단계] 차단 확장자 목록: {} (총 {}개)", blockedSet, blockedSet.size());
-      
       // ZipValidator를 사용한 압축 파일 내부 재귀 검증
       ZipValidator zipValidator = new ZipValidator(blockedSet, tika);
       zipValidator.validateZipFile(file, 0);
-      
-      log.info("[3단계] 압축 파일 검증 통과!");
-    } else {
-      log.info("[3단계] 압축 파일 아님, 검증 스킵");
     }
   }
 
@@ -527,22 +477,18 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
    * @throws RuntimeException 파일 저장 또는 권한 설정 실패 시
    */
   private UploadedFile validate4thDefense(Long spaceId, MultipartFile file, String extension) {
-    log.info("===== [4단계] 파일 저장 & 권한 제거 시작 =====");
     
     try {
       // 업로드 디렉토리 생성
       Path spacePath = Paths.get(uploadDirectory, spaceId.toString());
       Files.createDirectories(spacePath);
-      log.info("[4단계] 저장 디렉토리: {}", spacePath);
       
       // 고유한 파일명 생성
       String storedName = UUID.randomUUID().toString() + "." + extension;
       Path targetPath = spacePath.resolve(storedName);
-      log.info("[4단계] 저장 파일명: {}", storedName);
       
       // 파일 저장
       file.transferTo(targetPath.toFile());
-      log.info("[4단계] 파일 저장 완료: {}", targetPath);
       
       // 4단계 방어: chmod 644 적용 (실행 권한 제거)
       Set<PosixFilePermission> perms = new HashSet<>();
@@ -551,7 +497,6 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
       perms.add(PosixFilePermission.GROUP_READ);
       perms.add(PosixFilePermission.OTHERS_READ);
       Files.setPosixFilePermissions(targetPath, perms);  // chmod 644
-      log.info("[4단계] 파일 권한 설정 완료: rw-r--r-- (644)");
       
       // 메타데이터 저장
       UploadedFile uploadedFile = UploadedFile.builder()
@@ -565,12 +510,10 @@ public class UploadedFileServiceImpl extends BaseServiceImpl<UploadedFile> imple
           .build();
       
       UploadedFile saved = uploadedFileRepository.save(uploadedFile);
-      log.info("[4단계] DB 저장 완료 - fileId: {}", saved.getFileId());
       
       return saved;
       
     } catch (IOException e) {
-      log.error("[4단계] 파일 저장 실패: {}", e.getMessage());
       throw new RuntimeException("파일 저장 실패: " + e.getMessage(), e);
     }
   }

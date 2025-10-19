@@ -5,14 +5,12 @@ import com.flow.api.domain.data.MemberDto;
 import com.flow.api.service.MemberService;
 import com.woo.core.controller.BaseController;
 import com.woo.core.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/members")
 public class MemberController extends BaseController<Member, MemberDto> {

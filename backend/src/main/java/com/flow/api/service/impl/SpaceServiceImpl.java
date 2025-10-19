@@ -12,7 +12,6 @@ import com.flow.api.repository.MemberRepository;
 import com.flow.api.repository.SpaceRepository;
 import com.flow.api.service.SpaceService;
 import com.woo.core.service.BaseServiceImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @Transactional
 public class SpaceServiceImpl extends BaseServiceImpl<Space> implements SpaceService {

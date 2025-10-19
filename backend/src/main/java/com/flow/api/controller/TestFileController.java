@@ -1,7 +1,6 @@
 package com.flow.api.controller;
 
 import com.woo.core.response.BaseResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +25,6 @@ import java.util.Map;
  *   <li>4-archive: 압축 파일 (3단계 테스트)</li>
  * </ul>
  */
-@Slf4j
 @RestController
 @RequestMapping("/api/test-files")
 public class TestFileController {
@@ -74,25 +72,14 @@ public class TestFileController {
   public ResponseEntity<Resource> downloadTestFile(
       @PathVariable String category,
       @PathVariable String filename) {
-    
-    log.info("========== 테스트 파일 다운로드 시작 ==========");
-    log.info("요청 정보 - Category: {}, Filename: {}", category, filename);
-    
     try {
       String filePath = TEST_FILES_BASE + category + "/" + filename;
-      log.info("[1단계] 파일 경로 생성: {}", filePath);
       
       Resource resource = new ClassPathResource(filePath);
-      log.info("[2단계] ClassPathResource 생성 완료");
       
       if (!resource.exists()) {
-        log.warn("[실패] 파일이 존재하지 않음: {}", filePath);
         return ResponseEntity.notFound().build();
       }
-      
-      log.info("[3단계] 파일 존재 확인 완료");
-      log.info("[4단계] 다운로드 응답 생성 - MIME: application/octet-stream");
-      log.info("========== 테스트 파일 다운로드 성공 ==========");
       
       return ResponseEntity.ok()
           .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -101,8 +88,6 @@ public class TestFileController {
           .body(resource);
           
     } catch (Exception e) {
-      log.error("========== 테스트 파일 다운로드 실패 ==========");
-      log.error("에러 메시지: {}", e.getMessage(), e);
       return ResponseEntity.internalServerError().build();
     }
   }
