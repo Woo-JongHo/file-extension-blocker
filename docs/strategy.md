@@ -90,29 +90,6 @@
 
 ##### Backend (확장자 + 매직 넘버 검증)
 
-<<<<<<< HEAD
-=======
-**방어 우선순위**:
-
-**1순위: 확장자 Blacklist** (가장 중요!)
-- 파일명이 `.jpg`여도 확장자 재확인
-- 텍스트 스크립트 차단 (`.bat`, `.cmd`, `.vbs`, `.ps1`, `.sh`, `.php` 등)
-- 이 파일들은 **매직 넘버가 없어서** 확장자로만 차단 가능
-
-**2순위: Apache Tika 매직 넘버 검증** (보조)
-- 바이너리 실행 파일 감지:
-  - PE (Windows .exe): `4D 5A` (MZ)
-  - ELF (Linux): `7F 45 4C 46` (.ELF)
-- 이름을 `.jpg`로 바꿔도 실제 내용으로 감지
-
-**3순위: 서버 실행 방지** (최종 방어선)
-- 설령 업로드되어도 서버에서 실행 불가능하게 설정
-
-**Apache Tika의 한계**:
-- BAT, CMD, VBS, PS1, SH 같은 **텍스트 기반 스크립트는 매직 넘버가 없음**
-- Apache Tika의 패턴 매칭도 100% 감지 못할 수 있음
-- **따라서 확장자 Blacklist가 주 방어선!**
->>>>>>> c292ffc116b541d796a8af569b1d39e4d8155bfe
 
 ---
 
@@ -171,32 +148,17 @@ zipbomb.zip (42KB)
 
 **방어 방법 2: Zip Bomb 차단**
 
-<<<<<<< HEAD
-### 4단계: 모든 검증을 우회한 파일이 저장된다면?
-=======
 **검증 항목**:
 1. **압축 해제 크기 제한**
-   - 압축 파일 크기: 1MB
-   - 압축 해제 예상 크기: 100MB 이상
-   - **압축률 100배 이상 → 차단**
->>>>>>> c292ffc116b541d796a8af569b1d39e4d8155bfe
+   - 압축 파일 크기: 10MB
 
 **파일 저장 시 실행 권한을 완전히 제거하여 최종 방어선을 구축합니다.**
 
-<<<<<<< HEAD
-=======
-3. **파일 개수 제한**
-   - 압축 파일 내부 파일 개수: 최대 1,000개
-
-**최종 방어선**: 설령 악성 파일이 포함된 ZIP이 저장되어도, 서버에서 해제하지 않으면 실행 불가
-
----
 
 ### 4단계: 모든 검증을 우회한 파일이 저장된다면?
 
 **파일 저장 시 실행 권한을 완전히 제거하여 최종 방어선을 구축합니다.**
 
->>>>>>> c292ffc116b541d796a8af569b1d39e4d8155bfe
 > **공격 시나리오**
 > 
 > 1~3단계를 모두 우회한 악성 파일이 서버에 저장됨  
@@ -221,32 +183,5 @@ zipbomb.zip (42KB)
 # 저장 후 권한 설정 (안전)
 -rw-r--r--  malicious.sh  # 읽기만 가능, 실행 불가
 ```
-
-<<<<<<< HEAD
-=======
-**구현 코드**:
-```java
-// 파일 저장 후 즉시 권한 제거
-Path savedFile = Paths.get(filePath);
-Set<PosixFilePermission> perms = new HashSet<>();
-perms.add(PosixFilePermission.OWNER_READ);
-perms.add(PosixFilePermission.OWNER_WRITE);
-perms.add(PosixFilePermission.GROUP_READ);
-perms.add(PosixFilePermission.OTHERS_READ);
-Files.setPosixFilePermissions(savedFile, perms);  // chmod 644
-```
-
-**방어 방법 2: 저장 디렉토리 격리**
-- 업로드 디렉토리를 웹 루트 외부에 위치
-- 정적 파일로만 서빙 (코드 실행 불가 설정)
-- 예: `/Volumes/USB_WOO_2TB/flow-file-storage`
-
-**방어 방법 3: UUID 기반 파일명**
-- 원본 파일명 대신 UUID 사용
-- 확장자 기반 실행 우회 방지
-- 예: `malicious.sh` → `f1a2b3c4-d5e6-7890-abcd-ef1234567890.sh`
-
->>>>>>> c292ffc116b541d796a8af569b1d39e4d8155bfe
-**핵심**: 어떤 파일이든 **실행 권한이 없으면** 서버에서 실행 불가!
 
 ---
